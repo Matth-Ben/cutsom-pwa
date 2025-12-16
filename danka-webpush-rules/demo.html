@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebPush Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .button {
+            background-color: #0073aa;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background-color: #005177;
+        }
+        .button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+        }
+        .info {
+            background-color: #e7f2fa;
+            border-left: 4px solid #0073aa;
+            padding: 10px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Danka WebPush Rules - Demo</h1>
+    
+    <div class="info">
+        <strong>Note:</strong> This is a standalone demo file. In a WordPress site, the plugin automatically loads the required JavaScript.
+        This file demonstrates the manual API usage.
+    </div>
+    
+    <div class="status">
+        <h3>Notification Status</h3>
+        <p id="status">Checking...</p>
+    </div>
+    
+    <div>
+        <button id="subscribeBtn" class="button">Subscribe to Notifications</button>
+        <button id="unsubscribeBtn" class="button">Unsubscribe</button>
+        <button id="checkBtn" class="button">Check Subscription</button>
+    </div>
+    
+    <div class="info" style="margin-top: 20px;">
+        <h3>How to Use in WordPress</h3>
+        <p>Once the plugin is activated, add this code to your theme or use a button:</p>
+        <pre style="background: #f5f5f5; padding: 10px; overflow-x: auto;">
+&lt;button onclick="window.dankaWebPushAPI.subscribe()"&gt;
+    Enable Notifications
+&lt;/button&gt;
+
+&lt;button onclick="window.dankaWebPushAPI.unsubscribe()"&gt;
+    Disable Notifications
+&lt;/button&gt;</pre>
+    </div>
+    
+    <script>
+        // This demo assumes the plugin is installed and active
+        // In production, window.dankaWebPushAPI will be available
+        
+        const statusEl = document.getElementById('status');
+        const subscribeBtn = document.getElementById('subscribeBtn');
+        const unsubscribeBtn = document.getElementById('unsubscribeBtn');
+        const checkBtn = document.getElementById('checkBtn');
+        
+        function updateStatus(message) {
+            statusEl.textContent = message;
+        }
+        
+        function checkSupport() {
+            if (!('serviceWorker' in navigator)) {
+                updateStatus('Service Workers are not supported in this browser.');
+                subscribeBtn.disabled = true;
+                return false;
+            }
+            
+            if (!('PushManager' in window)) {
+                updateStatus('Push notifications are not supported in this browser.');
+                subscribeBtn.disabled = true;
+                return false;
+            }
+            
+            if (!('Notification' in window)) {
+                updateStatus('Notifications are not supported in this browser.');
+                subscribeBtn.disabled = true;
+                return false;
+            }
+            
+            return true;
+        }
+        
+        function checkPermission() {
+            if (!checkSupport()) return;
+            
+            const permission = Notification.permission;
+            if (permission === 'granted') {
+                updateStatus('Notifications are enabled.');
+            } else if (permission === 'denied') {
+                updateStatus('Notifications are blocked. Please enable them in browser settings.');
+                subscribeBtn.disabled = true;
+            } else {
+                updateStatus('Notification permission not yet requested.');
+            }
+        }
+        
+        subscribeBtn.addEventListener('click', function() {
+            if (typeof window.dankaWebPushAPI !== 'undefined') {
+                window.dankaWebPushAPI.subscribe()
+                    .then(() => {
+                        updateStatus('Successfully subscribed to notifications!');
+                    })
+                    .catch(error => {
+                        updateStatus('Failed to subscribe: ' + error.message);
+                    });
+            } else {
+                updateStatus('Plugin API not found. Make sure the plugin is installed and activated.');
+            }
+        });
+        
+        unsubscribeBtn.addEventListener('click', function() {
+            if (typeof window.dankaWebPushAPI !== 'undefined') {
+                window.dankaWebPushAPI.unsubscribe()
+                    .then(() => {
+                        updateStatus('Successfully unsubscribed from notifications.');
+                    })
+                    .catch(error => {
+                        updateStatus('Failed to unsubscribe: ' + error.message);
+                    });
+            } else {
+                updateStatus('Plugin API not found. Make sure the plugin is installed and activated.');
+            }
+        });
+        
+        checkBtn.addEventListener('click', function() {
+            if (typeof window.dankaWebPushAPI !== 'undefined') {
+                window.dankaWebPushAPI.checkSubscription()
+                    .then(subscription => {
+                        if (subscription) {
+                            updateStatus('Active subscription found: ' + subscription.endpoint.substring(0, 50) + '...');
+                        } else {
+                            updateStatus('No active subscription found.');
+                        }
+                    })
+                    .catch(error => {
+                        updateStatus('Failed to check subscription: ' + error.message);
+                    });
+            } else {
+                updateStatus('Plugin API not found. Make sure the plugin is installed and activated.');
+            }
+        });
+        
+        // Initialize
+        checkPermission();
+    </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+/* Admin styles for Danka WebPush Rules */
+.post-type-box {
+    margin-bottom: 20px;
+}
+
+.post-type-box .postbox-header {
+    cursor: pointer;
+}
+
+.post-type-box .postbox-header h2 {
+    margin: 0;
+    padding: 12px;
+}
+
+.post-type-box .postbox-header h2 label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.post-type-box .inside {
+    padding: 0 12px 12px;
+}
+
+.post-type-toggle {
+    margin: 0 !important;
+}
+
+#extra-fields-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #ccc;
+}
+
+#post-types-settings .form-table th {
+    width: 200px;
+}
+
+#post-types-settings .description {
+    font-style: italic;
+    color: #666;
+}
+
+.wrap h2 {
+    margin-top: 20px;
+}
