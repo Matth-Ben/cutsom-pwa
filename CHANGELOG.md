@@ -11,10 +11,21 @@ All notable changes to the Custom PWA plugin will be documented in this file.
   - Added proper HTTP headers (`X-Robots-Tag: noindex`)
 - Added missing `id` field in manifest (set to `/` for proper PWA identification)
 - Added missing `scope` field in manifest (set to `/` for full site scope)
+- Fixed icon sizes to use actual image dimensions instead of hardcoded sizes
+- Added `purpose: "any maskable"` to icons for better compatibility
+- Limited description to 300 characters to prevent truncation in manifest
+
+### Added
+- `display_override` support with `window-controls-overlay` for desktop PWAs
+- Screenshots field in admin interface (mobile and desktop)
+- Support for richer PWA install UI with screenshots
+- Filter `custom_pwa_manifest_screenshots` for programmatic screenshot management
 
 ### Changed
 - Improved manifest generation reliability
 - Enhanced HTTP response handling for manifest endpoint
+- Icons now use actual file dimensions detected via `getimagesize()`
+- Screenshots support wide/narrow form factors for different devices
 
 ## [1.0.0] - 2025-12-16
 

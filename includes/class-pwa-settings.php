@@ -134,6 +134,15 @@ class Custom_PWA_Settings {
 			'custom_pwa_settings',
 			'custom_pwa_settings_general'
 		);
+
+		// Screenshots.
+		add_settings_field(
+			'screenshots',
+			__( 'Screenshots', 'custom-pwa' ),
+			array( $this, 'render_screenshots_field' ),
+			'custom_pwa_settings',
+			'custom_pwa_settings_general'
+		);
 	}
 
 	/**
@@ -384,6 +393,116 @@ class Custom_PWA_Settings {
 	}
 
 	/**
+	 * Render screenshots field.
+	 */
+	public function render_screenshots_field() {
+		$options = get_option( $this->option_name, array() );
+		$screenshots = isset( $options['screenshots'] ) ? $options['screenshots'] : array();
+		?>
+		<div class="custom-pwa-screenshots-upload">
+			<input 
+				type="hidden" 
+				id="custom_pwa_screenshots" 
+				name="<?php echo esc_attr( $this->option_name ); ?>[screenshots]" 
+				value="<?php echo esc_attr( wp_json_encode( $screenshots ) ); ?>" 
+			/>
+			<div id="custom_pwa_screenshots_preview" style="margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 10px;">
+				<?php if ( ! empty( $screenshots ) ) : ?>
+					<?php foreach ( $screenshots as $screenshot ) : ?>
+						<?php
+						$img_id = isset( $screenshot['id'] ) ? $screenshot['id'] : 0;
+						$img_url = $img_id ? wp_get_attachment_url( $img_id ) : '';
+						$form_factor = isset( $screenshot['form_factor'] ) ? $screenshot['form_factor'] : 'narrow';
+						?>
+						<?php if ( $img_url ) : ?>
+							<div class="screenshot-item" data-id="<?php echo esc_attr( $img_id ); ?>" style="position: relative; border: 1px solid #ddd; padding: 5px;">
+								<img src="<?php echo esc_url( $img_url ); ?>" alt="Screenshot" style="max-width: 150px; height: auto; display: block;" />
+								<div style="margin-top: 5px; font-size: 11px;">
+									<strong><?php echo esc_html( ucfirst( $form_factor ) ); ?></strong>
+								</div>
+								<button type="button" class="button button-small custom_pwa_remove_screenshot" style="margin-top: 5px;">
+									<?php esc_html_e( 'Remove', 'custom-pwa' ); ?>
+								</button>
+							</div>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				<?php endif; ?>
+			</div>
+			<button type="button" class="button" id="custom_pwa_upload_screenshot_mobile_button">
+				<?php esc_html_e( 'Add Mobile Screenshot', 'custom-pwa' ); ?>
+			</button>
+			<button type="button" class="button" id="custom_pwa_upload_screenshot_desktop_button">
+				<?php esc_html_e( 'Add Desktop Screenshot', 'custom-pwa' ); ?>
+			</button>
+			<p class="description">
+				<?php esc_html_e( 'Add screenshots for richer PWA install UI. Mobile: portrait (narrow), Desktop: landscape (wide). Recommended sizes: 540x720px (mobile), 1280x720px (desktop).', 'custom-pwa' ); ?>
+			</p>
+		</div>
+
+		<script type="text/javascript">
+		jQuery(document).ready(function($) {
+			var screenshotsData = <?php echo wp_json_encode( $screenshots ); ?>;
+
+			function updateScreenshotsField() {
+				$('#custom_pwa_screenshots').val(JSON.stringify(screenshotsData));
+			}
+
+			function addScreenshot(formFactor) {
+				var mediaUploader = wp.media({
+					title: formFactor === 'wide' ? '<?php esc_html_e( 'Select Desktop Screenshot', 'custom-pwa' ); ?>' : '<?php esc_html_e( 'Select Mobile Screenshot', 'custom-pwa' ); ?>',
+					button: {
+						text: '<?php esc_html_e( 'Use this screenshot', 'custom-pwa' ); ?>'
+					},
+					multiple: false,
+					library: {
+						type: 'image'
+					}
+				});
+
+				mediaUploader.on('select', function() {
+					var attachment = mediaUploader.state().get('selection').first().toJSON();
+					var screenshot = {
+						id: attachment.id,
+						form_factor: formFactor
+					};
+					screenshotsData.push(screenshot);
+					
+					var html = '<div class="screenshot-item" data-id="' + attachment.id + '" style="position: relative; border: 1px solid #ddd; padding: 5px;">' +
+						'<img src="' + attachment.url + '" alt="Screenshot" style="max-width: 150px; height: auto; display: block;" />' +
+						'<div style="margin-top: 5px; font-size: 11px;"><strong>' + (formFactor === 'wide' ? 'Wide' : 'Narrow') + '</strong></div>' +
+						'<button type="button" class="button button-small custom_pwa_remove_screenshot" style="margin-top: 5px;"><?php esc_html_e( 'Remove', 'custom-pwa' ); ?></button>' +
+						'</div>';
+					$('#custom_pwa_screenshots_preview').append(html);
+					updateScreenshotsField();
+				});
+
+				mediaUploader.open();
+			}
+
+			$('#custom_pwa_upload_screenshot_mobile_button').on('click', function(e) {
+				e.preventDefault();
+				addScreenshot('narrow');
+			});
+
+			$('#custom_pwa_upload_screenshot_desktop_button').on('click', function(e) {
+				e.preventDefault();
+				addScreenshot('wide');
+			});
+
+			$(document).on('click', '.custom_pwa_remove_screenshot', function(e) {
+				e.preventDefault();
+				var $item = $(this).closest('.screenshot-item');
+				var imgId = $item.data('id');
+				screenshotsData = screenshotsData.filter(function(s) { return s.id != imgId; });
+				$item.remove();
+				updateScreenshotsField();
+			});
+		});
+		</script>
+		<?php
+	}
+
+	/**
 	 * Sanitize settings.
 	 *
 	 * @param array $input Raw input values.
@@ -404,6 +523,22 @@ class Custom_PWA_Settings {
 		$sanitized['display'] = in_array( $display, $valid_displays, true ) ? $display : 'standalone';
 
 		$sanitized['icon_id'] = isset( $input['icon_id'] ) ? absint( $input['icon_id'] ) : 0;
+
+		// Sanitize screenshots.
+		$sanitized['screenshots'] = array();
+		if ( isset( $input['screenshots'] ) && ! empty( $input['screenshots'] ) ) {
+			$screenshots = json_decode( $input['screenshots'], true );
+			if ( is_array( $screenshots ) ) {
+				foreach ( $screenshots as $screenshot ) {
+					if ( isset( $screenshot['id'] ) && isset( $screenshot['form_factor'] ) ) {
+						$sanitized['screenshots'][] = array(
+							'id'          => absint( $screenshot['id'] ),
+							'form_factor' => sanitize_text_field( $screenshot['form_factor'] ),
+						);
+					}
+				}
+			}
+		}
 
 		return $sanitized;
 	}
@@ -475,17 +610,21 @@ class Custom_PWA_Settings {
 	private function build_manifest() {
 		$options = get_option( $this->option_name, array() );
 
+		$display = isset( $options['display'] ) ? $options['display'] : 'standalone';
+
 		$manifest = array(
 			'id'               => '/',
 			'name'             => isset( $options['app_name'] ) ? $options['app_name'] : get_bloginfo( 'name' ),
 			'short_name'       => isset( $options['short_name'] ) ? $options['short_name'] : get_bloginfo( 'name' ),
-			'description'      => isset( $options['description'] ) ? $options['description'] : get_bloginfo( 'description' ),
+			'description'      => isset( $options['description'] ) ? $options['description'] : substr( get_bloginfo( 'description' ), 0, 300 ),
 			'start_url'        => isset( $options['start_url'] ) ? $options['start_url'] : home_url( '/' ),
 			'scope'            => '/',
-			'display'          => isset( $options['display'] ) ? $options['display'] : 'standalone',
+			'display'          => $display,
+			'display_override' => array( 'window-controls-overlay', $display ),
 			'background_color' => isset( $options['background_color'] ) ? $options['background_color'] : '#ffffff',
 			'theme_color'      => isset( $options['theme_color'] ) ? $options['theme_color'] : '#000000',
 			'icons'            => $this->get_icons(),
+			'screenshots'      => $this->get_screenshots(),
 		);
 
 		return $manifest;
@@ -506,41 +645,130 @@ class Custom_PWA_Settings {
 		if ( $icon_id ) {
 			$icon_url = wp_get_attachment_url( $icon_id );
 			if ( $icon_url ) {
-				$icons[] = array(
-					'src'   => $icon_url,
-					'sizes' => '512x512',
-					'type'  => 'image/png',
-				);
-				$icons[] = array(
-					'src'   => $icon_url,
-					'sizes' => '192x192',
-					'type'  => 'image/png',
-				);
+				// Get the actual image size
+				$icon_path = get_attached_file( $icon_id );
+				if ( $icon_path && file_exists( $icon_path ) ) {
+					$image_size = getimagesize( $icon_path );
+					if ( $image_size ) {
+						$actual_size = $image_size[0] . 'x' . $image_size[1];
+						$mime_type = $image_size['mime'];
+						
+						// Add icon with actual size
+						$icons[] = array(
+							'src'     => $icon_url,
+							'sizes'   => $actual_size,
+							'type'    => $mime_type,
+							'purpose' => 'any maskable',
+						);
+					}
+				}
 			}
 		}
 
 		// Fallback to Site Icon.
 		if ( empty( $icons ) ) {
-			$site_icon_url = get_site_icon_url( 512 );
-			if ( $site_icon_url ) {
-				$icons[] = array(
-					'src'   => $site_icon_url,
-					'sizes' => '512x512',
-					'type'  => 'image/png',
-				);
+			$site_icon_id = get_option( 'site_icon' );
+			if ( $site_icon_id ) {
+				$site_icon_url = wp_get_attachment_url( $site_icon_id );
+				$site_icon_path = get_attached_file( $site_icon_id );
+				
+				if ( $site_icon_path && file_exists( $site_icon_path ) ) {
+					$image_size = getimagesize( $site_icon_path );
+					if ( $image_size ) {
+						$actual_size = $image_size[0] . 'x' . $image_size[1];
+						$mime_type = $image_size['mime'];
+						
+						$icons[] = array(
+							'src'     => $site_icon_url,
+							'sizes'   => $actual_size,
+							'type'    => $mime_type,
+							'purpose' => 'any maskable',
+						);
+					}
+				}
 			}
-
-			$site_icon_url_192 = get_site_icon_url( 192 );
-			if ( $site_icon_url_192 ) {
-				$icons[] = array(
-					'src'   => $site_icon_url_192,
-					'sizes' => '192x192',
-					'type'  => 'image/png',
-				);
+			
+			// Additional fallback sizes
+			$sizes = array( 512, 192 );
+			foreach ( $sizes as $size ) {
+				$site_icon_url = get_site_icon_url( $size );
+				if ( $site_icon_url && ! $this->icon_exists( $icons, $site_icon_url ) ) {
+					$icons[] = array(
+						'src'     => $site_icon_url,
+						'sizes'   => $size . 'x' . $size,
+						'type'    => 'image/png',
+						'purpose' => 'any',
+					);
+				}
 			}
 		}
 
 		return $icons;
+	}
+
+	/**
+	 * Check if icon already exists in array.
+	 *
+	 * @param array  $icons Icon array.
+	 * @param string $url   Icon URL to check.
+	 * @return bool True if exists.
+	 */
+	private function icon_exists( $icons, $url ) {
+		foreach ( $icons as $icon ) {
+			if ( isset( $icon['src'] ) && $icon['src'] === $url ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Get screenshots array for manifest.
+	 *
+	 * @return array Screenshots array.
+	 */
+	private function get_screenshots() {
+		$options = get_option( $this->option_name, array() );
+		$screenshots_data = isset( $options['screenshots'] ) ? $options['screenshots'] : array();
+		
+		$screenshots = array();
+		
+		foreach ( $screenshots_data as $screenshot ) {
+			$img_id = isset( $screenshot['id'] ) ? absint( $screenshot['id'] ) : 0;
+			$form_factor = isset( $screenshot['form_factor'] ) ? $screenshot['form_factor'] : 'narrow';
+			
+			if ( $img_id ) {
+				$img_url = wp_get_attachment_url( $img_id );
+				$img_path = get_attached_file( $img_id );
+				
+				if ( $img_url && $img_path && file_exists( $img_path ) ) {
+					$image_size = getimagesize( $img_path );
+					if ( $image_size ) {
+						$screenshot_item = array(
+							'src'   => $img_url,
+							'sizes' => $image_size[0] . 'x' . $image_size[1],
+							'type'  => $image_size['mime'],
+						);
+						
+						// Add form_factor only if it's 'wide', otherwise omit for narrow (default)
+						if ( $form_factor === 'wide' ) {
+							$screenshot_item['form_factor'] = 'wide';
+						}
+						
+						$screenshots[] = $screenshot_item;
+					}
+				}
+			}
+		}
+		
+		/**
+		 * Filter the screenshots data for PWA manifest.
+		 *
+		 * @since 1.0.1
+		 *
+		 * @param array $screenshots Screenshots array.
+		 */
+		return apply_filters( 'custom_pwa_manifest_screenshots', $screenshots );
 	}
 
 	/**
