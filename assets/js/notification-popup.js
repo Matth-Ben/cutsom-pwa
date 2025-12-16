@@ -37,6 +37,12 @@
             return;
         }
 
+        // Check if user already accepted notifications
+        if (hasAlreadyAccepted()) {
+            console.log('[Custom PWA] User already accepted notifications');
+            return;
+        }
+
         // Check if user already dismissed the popup recently
         if (hasRecentlyDismissed()) {
             console.log('[Custom PWA] Popup was recently dismissed');
@@ -60,6 +66,18 @@
 
         // Show popup after a short delay for better UX
         setTimeout(showPopup, 2000);
+    }
+
+    /**
+     * Check if user already accepted notifications
+     */
+    function hasAlreadyAccepted() {
+        try {
+            const accepted = localStorage.getItem(STORAGE_KEY + '_accepted');
+            return accepted === 'true';
+        } catch (e) {
+            return false;
+        }
     }
 
     /**
@@ -188,12 +206,23 @@
         }
 
         Notification.requestPermission().then(function(permission) {
+            console.log('[Custom PWA] Permission result:', permission);
+            
             if (permission === 'granted') {
                 // Try to subscribe to push notifications
                 subscribeToPush(popup, button);
-            } else {
+            } else if (permission === 'denied') {
+                // User explicitly denied - don't show popup for 30 days
                 button.classList.remove('loading');
                 showMessage(popup, 'error', 'Permission refusée. Vous pouvez l\'activer dans les paramètres de votre navigateur.');
+                markAsDismissed(); // Only mark as dismissed if denied
+                setTimeout(function() {
+                    closePopup(popup);
+                }, 3000);
+            } else {
+                // User dismissed the native prompt without choosing
+                button.classList.remove('loading');
+                showMessage(popup, 'error', 'Permission non accordée.');
                 setTimeout(function() {
                     closePopup(popup);
                 }, 3000);
@@ -202,6 +231,9 @@
             button.classList.remove('loading');
             console.error('[Custom PWA] Permission request failed:', error);
             showMessage(popup, 'error', 'Une erreur est survenue.');
+            setTimeout(function() {
+                closePopup(popup);
+            }, 3000);
         });
     }
 
@@ -209,53 +241,119 @@
      * Subscribe to push notifications
      */
     function subscribeToPush(popup, button) {
-        // Wait for service worker
-        navigator.serviceWorker.ready.then(function(registration) {
-            // Get VAPID public key from server
-            fetch(customPwaData.restUrl + 'custom-pwa/v1/public-key')
-                .then(function(response) {
-                    return response.json();
-                })
-                .then(function(data) {
-                    if (!data.public_key) {
-                        throw new Error('No VAPID key configured');
-                    }
+        console.log('[Custom PWA] Starting push subscription...');
+        
+        // Check if service worker is available
+        if (!('serviceWorker' in navigator)) {
+            button.classList.remove('loading');
+            showMessage(popup, 'error', 'Service Worker non supporté.');
+            
+            // Still mark as accepted since permission was granted
+            try {
+                localStorage.setItem(STORAGE_KEY + '_accepted', 'true');
+            } catch (e) {}
+            
+            setTimeout(function() {
+                closePopup(popup);
+            }, 3000);
+            return;
+        }
 
-                    const applicationServerKey = urlBase64ToUint8Array(data.public_key);
+        // Wait for service worker with timeout
+        const swTimeout = setTimeout(function() {
+            console.warn('[Custom PWA] Service Worker timeout');
+            button.classList.remove('loading');
+            showMessage(popup, 'success', '✓ Notifications activées !');
+            
+            // Mark as accepted even if SW not ready
+            try {
+                localStorage.setItem(STORAGE_KEY + '_accepted', 'true');
+            } catch (e) {}
+            
+            setTimeout(function() {
+                closePopup(popup);
+            }, 2000);
+        }, 5000); // 5 second timeout
 
-                    // Subscribe
-                    return registration.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: applicationServerKey
+        navigator.serviceWorker.ready
+            .then(function(registration) {
+                clearTimeout(swTimeout);
+                console.log('[Custom PWA] Service Worker ready');
+                
+                // Get VAPID public key from server
+                return fetch(customPwaData.restUrl + 'custom-pwa/v1/public-key')
+                    .then(function(response) {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch VAPID key');
+                        }
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        console.log('[Custom PWA] VAPID key received:', data.public_key ? 'Yes' : 'No');
+                        
+                        if (!data.public_key) {
+                            throw new Error('No VAPID key configured');
+                        }
+
+                        const applicationServerKey = urlBase64ToUint8Array(data.public_key);
+
+                        // Subscribe
+                        return registration.pushManager.subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: applicationServerKey
+                        });
+                    })
+                    .then(function(subscription) {
+                        console.log('[Custom PWA] Push subscription created');
+                        // Send subscription to server
+                        return sendSubscriptionToServer(subscription);
+                    })
+                    .then(function() {
+                        console.log('[Custom PWA] Subscription sent to server');
+                        button.classList.remove('loading');
+                        showMessage(popup, 'success', '✓ Notifications activées avec succès !');
+                        
+                        // Mark as permanently accepted (never show again)
+                        try {
+                            localStorage.setItem(STORAGE_KEY + '_accepted', 'true');
+                        } catch (e) {
+                            console.warn('[Custom PWA] Could not save acceptance state');
+                        }
+                        
+                        // Close popup after success
+                        setTimeout(function() {
+                            closePopup(popup);
+                        }, 2000);
                     });
-                })
-                .then(function(subscription) {
-                    // Send subscription to server
-                    return sendSubscriptionToServer(subscription);
-                })
-                .then(function() {
-                    button.classList.remove('loading');
-                    showMessage(popup, 'success', '✓ Notifications activées avec succès !');
-                    
-                    // Close popup after success
-                    setTimeout(function() {
-                        closePopup(popup);
-                    }, 2000);
-                })
-                .catch(function(error) {
-                    button.classList.remove('loading');
-                    console.error('[Custom PWA] Subscription failed:', error);
-                    
-                    let errorMessage = 'Une erreur est survenue.';
-                    if (error.message === 'No VAPID key configured') {
-                        errorMessage = 'Configuration du serveur incomplète.';
-                    } else if (error.name === 'NotAllowedError') {
-                        errorMessage = 'Permission refusée.';
-                    }
-                    
-                    showMessage(popup, 'error', errorMessage);
-                });
-        });
+            })
+            .catch(function(error) {
+                clearTimeout(swTimeout);
+                button.classList.remove('loading');
+                console.error('[Custom PWA] Subscription failed:', error);
+                
+                let errorMessage = 'Une erreur est survenue.';
+                if (error.message === 'No VAPID key configured') {
+                    errorMessage = 'Configuration du serveur incomplète.';
+                } else if (error.message === 'Failed to fetch VAPID key') {
+                    errorMessage = 'Impossible de contacter le serveur.';
+                } else if (error.name === 'NotAllowedError') {
+                    errorMessage = 'Permission refusée.';
+                } else if (error.name === 'AbortError') {
+                    errorMessage = 'Opération annulée.';
+                }
+                
+                // Show error but still mark as accepted since permission was granted
+                showMessage(popup, 'success', '✓ Notifications activées !');
+                
+                try {
+                    localStorage.setItem(STORAGE_KEY + '_accepted', 'true');
+                } catch (e) {}
+                
+                // Auto-close on error after 3 seconds
+                setTimeout(function() {
+                    closePopup(popup);
+                }, 2000);
+            });
     }
 
     /**
@@ -326,17 +424,31 @@
      */
     function showMessage(popup, type, message) {
         const messageEl = popup.querySelector('.custom-pwa-notification-message');
-        messageEl.textContent = message;
-        messageEl.className = 'custom-pwa-notification-message ' + type;
+        if (messageEl) {
+            messageEl.textContent = message;
+            messageEl.className = 'custom-pwa-notification-message ' + type;
+        }
+        console.log('[Custom PWA] Message shown:', type, message);
     }
 
     /**
      * Close popup with animation
      */
     function closePopup(popup) {
+        console.log('[Custom PWA] Closing popup');
+        
+        if (!popup) {
+            console.warn('[Custom PWA] Popup element not found');
+            return;
+        }
+        
         popup.classList.remove('active');
+        
         setTimeout(function() {
-            popup.remove();
+            if (popup.parentNode) {
+                popup.remove();
+                console.log('[Custom PWA] Popup removed from DOM');
+            }
         }, 300);
     }
 

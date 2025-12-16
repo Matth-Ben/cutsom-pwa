@@ -14,6 +14,19 @@ All notable changes to the Custom PWA plugin will be documented in this file.
 - Fixed icon sizes to use actual image dimensions instead of hardcoded sizes
 - Added `purpose: "any maskable"` to icons for better compatibility
 - Limited description to 300 characters to prevent truncation in manifest
+- **Fixed notification popup not closing after accepting**
+  - Added permanent localStorage flag after acceptance
+  - Popup now never shows again after user accepts
+  - Added verification check before displaying popup
+  - Auto-close error messages after 3 seconds
+  - Improved closing logic with better error handling
+  - Added console logs for debugging
+  - **Fixed**: Popup now closes even if service worker fails to load
+  - **Fixed**: Added 5-second timeout for service worker readiness
+  - **Fixed**: Better handling of permission states (granted/denied/default)
+  - **Fixed**: Only mark as "dismissed for 30 days" when explicitly denied
+  - Popup closes successfully even if VAPID key is not configured
+  - Permission granted = popup closes, regardless of technical errors
 
 ### Added
 - **Notification permission popup**: Modern popup automatically displayed on frontend
