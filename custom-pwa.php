@@ -164,31 +164,49 @@ class Custom_PWA_Plugin {
 	 * Enqueue frontend scripts.
 	 */
 	public function enqueue_frontend_scripts() {
-		// Only enqueue if Push is enabled.
+		// Check if Push is enabled.
 		$config = get_option( 'custom_pwa_config', array() );
-		if ( empty( $config['enable_push'] ) ) {
-			return;
-		}
+		$push_enabled = ! empty( $config['enable_push'] );
 
-		wp_enqueue_script(
-			'custom-pwa-subscribe',
-			CUSTOM_PWA_PLUGIN_URL . 'assets/js/frontend-subscribe.js',
-			array(),
-			CUSTOM_PWA_VERSION,
-			true
-		);
+		// Enqueue notification popup styles and script if push is enabled
+		if ( $push_enabled ) {
+			// Enqueue popup CSS
+			wp_enqueue_style(
+				'custom-pwa-notification-popup',
+				CUSTOM_PWA_PLUGIN_URL . 'assets/css/notification-popup.css',
+				array(),
+				CUSTOM_PWA_VERSION
+			);
 
-		// Localize script with data.
-		wp_localize_script(
-			'custom-pwa-subscribe',
-			'customPwaData',
-			array(
+			// Enqueue popup JS
+			wp_enqueue_script(
+				'custom-pwa-notification-popup',
+				CUSTOM_PWA_PLUGIN_URL . 'assets/js/notification-popup.js',
+				array(),
+				CUSTOM_PWA_VERSION,
+				true
+			);
+
+			// Enqueue subscribe script
+			wp_enqueue_script(
+				'custom-pwa-subscribe',
+				CUSTOM_PWA_PLUGIN_URL . 'assets/js/frontend-subscribe.js',
+				array(),
+				CUSTOM_PWA_VERSION,
+				true
+			);
+
+			// Localize script with data for both scripts
+			$localize_data = array(
 				'restUrl'     => rest_url(),
 				'lang'        => get_bloginfo( 'language' ),
-				'swPath'      => '/sw.js', // Developer can adjust this.
-				'pushEnabled' => ! empty( $config['enable_push'] ),
-			)
-		);
+				'swPath'      => '/sw.js',
+				'pushEnabled' => '1',
+			);
+
+			wp_localize_script( 'custom-pwa-notification-popup', 'customPwaData', $localize_data );
+			wp_localize_script( 'custom-pwa-subscribe', 'customPwaData', $localize_data );
+		}
 	}
 
 	/**

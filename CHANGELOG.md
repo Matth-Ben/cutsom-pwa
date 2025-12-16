@@ -16,16 +16,27 @@ All notable changes to the Custom PWA plugin will be documented in this file.
 - Limited description to 300 characters to prevent truncation in manifest
 
 ### Added
+- **Notification permission popup**: Modern popup automatically displayed on frontend
+  - Beautiful, responsive design with dark mode support
+  - Smart display logic (only shown once per 30 days if dismissed)
+  - Checks notification permission status before showing
+  - "Activate notifications" and "Later" buttons
+  - Loading states and success/error messages
+  - Auto-closes after successful subscription
+  - Keyboard support (ESC to close)
 - `display_override` support with `window-controls-overlay` for desktop PWAs
 - Screenshots field in admin interface (mobile and desktop)
 - Support for richer PWA install UI with screenshots
 - Filter `custom_pwa_manifest_screenshots` for programmatic screenshot management
+- CSS file for popup styling (`assets/css/notification-popup.css`)
+- JavaScript file for popup logic (`assets/js/notification-popup.js`)
 
 ### Changed
 - Improved manifest generation reliability
 - Enhanced HTTP response handling for manifest endpoint
 - Icons now use actual file dimensions detected via `getimagesize()`
 - Screenshots support wide/narrow form factors for different devices
+- Frontend scripts now load popup CSS and JS automatically when push is enabled
 
 ## [1.0.0] - 2025-12-16
 

@@ -1,0 +1,246 @@
+/**
+ * Notification Popup Styles
+ * 
+ * Styles for the push notification permission popup
+ * 
+ * @package Custom_PWA
+ * @since 1.0.1
+ */
+
+/* Overlay */
+.custom-pwa-notification-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.custom-pwa-notification-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Popup Container */
+.custom-pwa-notification-popup {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 90%;
+    padding: 32px;
+    position: relative;
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.custom-pwa-notification-overlay.active .custom-pwa-notification-popup {
+    transform: scale(1) translateY(0);
+}
+
+/* Close button */
+.custom-pwa-notification-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    color: #999;
+    padding: 4px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.custom-pwa-notification-close:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+/* Icon */
+.custom-pwa-notification-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+}
+
+/* Content */
+.custom-pwa-notification-content {
+    text-align: center;
+}
+
+.custom-pwa-notification-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 12px;
+    line-height: 1.3;
+}
+
+.custom-pwa-notification-description {
+    font-size: 15px;
+    color: #666;
+    line-height: 1.5;
+    margin: 0 0 24px;
+}
+
+/* Buttons */
+.custom-pwa-notification-actions {
+    display: flex;
+    gap: 12px;
+    flex-direction: column;
+}
+
+.custom-pwa-notification-button {
+    padding: 14px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    font-family: inherit;
+}
+
+.custom-pwa-notification-button-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.custom-pwa-notification-button-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.custom-pwa-notification-button-secondary {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.custom-pwa-notification-button-secondary:hover {
+    background: #e8e8e8;
+    color: #333;
+}
+
+/* Loading state */
+.custom-pwa-notification-button.loading {
+    position: relative;
+    color: transparent;
+    pointer-events: none;
+}
+
+.custom-pwa-notification-button.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: custom-pwa-spin 0.6s linear infinite;
+}
+
+@keyframes custom-pwa-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Success/Error messages */
+.custom-pwa-notification-message {
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+    display: none;
+}
+
+.custom-pwa-notification-message.success {
+    background: #e8f5e9;
+    color: #2e7d32;
+    display: block;
+}
+
+.custom-pwa-notification-message.error {
+    background: #ffebee;
+    color: #c62828;
+    display: block;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .custom-pwa-notification-popup {
+        padding: 24px;
+        max-width: 340px;
+    }
+
+    .custom-pwa-notification-title {
+        font-size: 20px;
+    }
+
+    .custom-pwa-notification-description {
+        font-size: 14px;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .custom-pwa-notification-popup {
+        background: #1e1e1e;
+        color: #e0e0e0;
+    }
+
+    .custom-pwa-notification-title {
+        color: #fff;
+    }
+
+    .custom-pwa-notification-description {
+        color: #b0b0b0;
+    }
+
+    .custom-pwa-notification-button-secondary {
+        background: #2a2a2a;
+        color: #b0b0b0;
+    }
+
+    .custom-pwa-notification-button-secondary:hover {
+        background: #333;
+        color: #e0e0e0;
+    }
+
+    .custom-pwa-notification-close {
+        color: #b0b0b0;
+    }
+
+    .custom-pwa-notification-close:hover {
+        background: #2a2a2a;
+        color: #fff;
+    }
+}
