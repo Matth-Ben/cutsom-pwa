@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Danka WebPush Rules
- * Plugin URI: https://github.com/Matth-Ben/cutsom-pwa
+ * Plugin URI: https://github.com/Matth-Ben/custom-pwa
  * Description: Manage Web Push notifications with customizable templates per post type and site-specific configurations
  * Version: 1.0.0
  * Requires at least: 6.0
@@ -199,14 +199,27 @@ class Danka_WebPush_Rules {
     
     private function get_client_ip() {
         $ip = '';
-        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
-            $ip = $_SERVER['HTTP_CLIENT_IP'];
-        } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        } elseif (isset($_SERVER['REMOTE_ADDR'])) {
+        
+        // First check REMOTE_ADDR which is the most reliable
+        if (isset($_SERVER['REMOTE_ADDR'])) {
             $ip = $_SERVER['REMOTE_ADDR'];
         }
-        return $ip;
+        
+        // If behind a proxy, check forwarded headers (but validate them)
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $forwarded_ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            $forwarded_ip = trim($forwarded_ips[0]);
+            
+            // Validate IP address format
+            if (filter_var($forwarded_ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                $ip = $forwarded_ip;
+            }
+        }
+        
+        // Validate and sanitize the final IP
+        $ip = filter_var($ip, FILTER_VALIDATE_IP);
+        
+        return $ip ?: '';
     }
     
     public function add_admin_menu() {

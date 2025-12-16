@@ -331,7 +331,7 @@ sendNotifications();
 For issues or questions:
 - Check the README.md file
 - Review the demo.html file
-- Visit: https://github.com/Matth-Ben/cutsom-pwa
+- Visit: https://github.com/Matth-Ben/custom-pwa
 
 ## Uninstallation
 

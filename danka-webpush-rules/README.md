@@ -250,7 +250,7 @@ When the plugin is deleted (not just deactivated):
 ## Support
 
 For issues, questions, or contributions, please visit:
-https://github.com/Matth-Ben/cutsom-pwa
+https://github.com/Matth-Ben/custom-pwa
 
 ## License
 

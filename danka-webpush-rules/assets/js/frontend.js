@@ -131,10 +131,17 @@
     }
     
     // Get application server key (VAPID public key)
-    // In production, this should be generated and stored securely
+    // IMPORTANT: In production, this should be loaded from WordPress options
+    // and configured via the admin interface or wp-config.php
     function getApplicationServerKey() {
-        // This is a placeholder - you should generate your own VAPID keys
-        // Use: npx web-push generate-vapid-keys
+        // Check if key is provided via inline script (set by WordPress)
+        if (typeof window.dankaWebPushVapidKey !== 'undefined' && window.dankaWebPushVapidKey) {
+            return window.dankaWebPushVapidKey;
+        }
+        
+        // Fallback placeholder key - MUST be replaced for production use
+        // Generate keys with: npx web-push generate-vapid-keys
+        console.warn('Using placeholder VAPID key. Please configure proper keys in production!');
         return 'BEl62iUYgUivxIkv69yViEuiBIa-Ib37J8YN2iu6F3GKZMgJVoGPOYHdAJRf_oIf3c1qEt1dWd5v95a6qZ5wM=';
     }
     

@@ -188,7 +188,7 @@ $post_types = get_post_types(['public' => true], 'objects');
     <?php
     global $wpdb;
     $table_name = $wpdb->prefix . 'danka_webpush_subscriptions';
-    $total_subscriptions = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
+    $total_subscriptions = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$table_name}"));
     ?>
-    <p><?php printf(__('Total active subscriptions: %d', 'danka-webpush-rules'), $total_subscriptions); ?></p>
+    <p><?php printf(__('Total active subscriptions: %d', 'danka-webpush-rules'), intval($total_subscriptions)); ?></p>
 </div>
