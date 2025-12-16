@@ -1,0 +1,96 @@
+# Changelog
+
+All notable changes to the Custom PWA plugin will be documented in this file.
+
+## [1.0.0] - 2025-12-16
+
+### Initial Release
+
+#### Added
+- Complete PWA configuration system
+  - Dynamic web app manifest generation
+  - Customizable app name, colors, and icons
+  - Support for multiple display modes
+  - Automatic meta tag injection for iOS/Android
+  - Fallback to WordPress Site Icon
+
+- Web Push notification system
+  - Custom database table for subscriptions
+  - REST API endpoints for subscribe/unsubscribe
+  - Per-post-type notification rules
+  - Customizable notification templates
+  - Template placeholder system
+  - Multi-platform support (Android, iOS, Mac, Windows)
+  - Test notification functionality
+
+- Admin interface
+  - Top-level "Custom PWA" menu with smartphone icon
+  - Three organized submenus: PWA, Push, Config
+  - WordPress Settings API integration
+  - Media uploader for icon selection
+  - Real-time test tools
+
+- Developer features
+  - Extensive filter and action hooks
+  - Clean, modular architecture
+  - Well-documented code
+  - Example service worker
+  - Example offline page
+  - Comprehensive documentation
+
+- Frontend functionality
+  - Automatic push subscription handling
+  - Platform detection
+  - Browser support detection
+  - Service worker integration
+
+- Example files
+  - sw-example.js - Complete service worker implementation
+  - offline-example.html - Styled offline fallback page
+  - Detailed setup instructions
+
+#### Developer Hooks
+- Filters: `custom_pwa_config_options`, `custom_pwa_manifest_data`, `custom_pwa_push_rules`, `custom_pwa_notification_context`, `custom_pwa_push_payload`, `custom_pwa_site_types`
+- Actions: `custom_pwa_init`, `custom_pwa_activated`, `custom_pwa_deactivated`, `custom_pwa_admin_menu_registered`, `custom_pwa_head_tags_injected`, `custom_pwa_config_fields_registered`
+
+#### Notes
+- Requires PHP 8.0+ and WordPress 6.0+
+- HTTPS required for service workers and push notifications
+- Real Web Push sending requires integration of external library (stub implementation included)
+- VAPID keys must be generated for production use
+
+---
+
+## Upgrade Instructions
+
+### From Nothing to 1.0.0
+1. Upload plugin to `/wp-content/plugins/custom-pwa/`
+2. Activate plugin
+3. Configure settings in Custom PWA menu
+4. Copy service worker to site root
+5. Test functionality
+
+---
+
+## Future Enhancements (Planned)
+
+- [ ] Built-in VAPID key generator
+- [ ] Notification scheduling
+- [ ] User-specific notification preferences
+- [ ] Analytics integration
+- [ ] Push notification campaigns
+- [ ] A/B testing for notifications
+- [ ] Rich media support (images, actions)
+- [ ] Notification history viewer
+- [ ] Export/import settings
+- [ ] Multi-language notification templates
+
+---
+
+## Support
+
+For bug reports and feature requests, please refer to the plugin documentation or contact the developer.
+
+## License
+
+GPL v2 or later

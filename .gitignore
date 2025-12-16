@@ -1,0 +1,44 @@
+# WordPress
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+error_log
+debug.log
+
+# Composer
+/vendor/
+composer.lock
+
+# Node
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build files
+/dist/
+/build/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# Plugin specific
+/languages/*.pot
