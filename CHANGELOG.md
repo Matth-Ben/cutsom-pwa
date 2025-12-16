@@ -2,6 +2,20 @@
 
 All notable changes to the Custom PWA plugin will be documented in this file.
 
+## [1.0.1] - 2025-12-16
+
+### Fixed
+- **Critical**: Fixed manifest generation returning HTML instead of JSON
+  - Changed hook from `template_redirect` to `parse_request` for earlier execution
+  - Added output buffer cleaning to prevent HTML contamination
+  - Added proper HTTP headers (`X-Robots-Tag: noindex`)
+- Added missing `id` field in manifest (set to `/` for proper PWA identification)
+- Added missing `scope` field in manifest (set to `/` for full site scope)
+
+### Changed
+- Improved manifest generation reliability
+- Enhanced HTTP response handling for manifest endpoint
+
 ## [1.0.0] - 2025-12-16
 
 ### Initial Release

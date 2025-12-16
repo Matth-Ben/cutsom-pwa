@@ -3,7 +3,7 @@
  * Plugin Name: Custom PWA
  * Plugin URI: https://example.com/custom-pwa
  * Description: Complete PWA configuration and Web Push notifications plugin for WordPress. Supports manifest generation, service worker examples, and push notifications for all post types including custom post types.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Your Name
  * Author URI: https://example.com
  * License: GPL v2 or later
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Main plugin constants.
  */
-define( 'CUSTOM_PWA_VERSION', '1.0.0' );
+define( 'CUSTOM_PWA_VERSION', '1.0.1' );
 define( 'CUSTOM_PWA_PLUGIN_FILE', __FILE__ );
 define( 'CUSTOM_PWA_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CUSTOM_PWA_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

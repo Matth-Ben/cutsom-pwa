@@ -39,7 +39,7 @@ class Custom_PWA_Settings {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'init', array( $this, 'add_rewrite_rules' ) );
 		add_action( 'query_vars', array( $this, 'add_query_vars' ) );
-		add_action( 'template_redirect', array( $this, 'serve_manifest' ) );
+		add_action( 'parse_request', array( $this, 'serve_manifest' ) );
 		add_action( 'wp_head', array( $this, 'inject_head_tags' ), 1 );
 	}
 
@@ -428,9 +428,11 @@ class Custom_PWA_Settings {
 
 	/**
 	 * Serve the manifest file.
+	 * 
+	 * @param WP $wp Current WordPress environment instance.
 	 */
-	public function serve_manifest() {
-		if ( ! get_query_var( 'custom_pwa_manifest' ) ) {
+	public function serve_manifest( $wp ) {
+		if ( ! isset( $wp->query_vars['custom_pwa_manifest'] ) || ! $wp->query_vars['custom_pwa_manifest'] ) {
 			return;
 		}
 
@@ -452,7 +454,15 @@ class Custom_PWA_Settings {
 		 */
 		$manifest = apply_filters( 'custom_pwa_manifest_data', $manifest );
 
+		// Clear any output buffers
+		while ( ob_get_level() > 0 ) {
+			ob_end_clean();
+		}
+
+		// Prevent WordPress from continuing
+		status_header( 200 );
 		header( 'Content-Type: application/manifest+json; charset=utf-8' );
+		header( 'X-Robots-Tag: noindex' );
 		echo wp_json_encode( $manifest, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT );
 		exit;
 	}
@@ -466,10 +476,12 @@ class Custom_PWA_Settings {
 		$options = get_option( $this->option_name, array() );
 
 		$manifest = array(
+			'id'               => '/',
 			'name'             => isset( $options['app_name'] ) ? $options['app_name'] : get_bloginfo( 'name' ),
 			'short_name'       => isset( $options['short_name'] ) ? $options['short_name'] : get_bloginfo( 'name' ),
 			'description'      => isset( $options['description'] ) ? $options['description'] : get_bloginfo( 'description' ),
 			'start_url'        => isset( $options['start_url'] ) ? $options['start_url'] : home_url( '/' ),
+			'scope'            => '/',
 			'display'          => isset( $options['display'] ) ? $options['display'] : 'standalone',
 			'background_color' => isset( $options['background_color'] ) ? $options['background_color'] : '#ffffff',
 			'theme_color'      => isset( $options['theme_color'] ) ? $options['theme_color'] : '#000000',
