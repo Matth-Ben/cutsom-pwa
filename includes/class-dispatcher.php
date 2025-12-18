@@ -49,24 +49,107 @@ class Custom_PWA_Dispatcher {
 	 * Constructor.
 	 */
 	public function __construct() {
-		add_action( 'transition_post_status', array( $this, 'handle_post_publish' ), 10, 3 );
+		add_action( 'transition_post_status', array( $this, 'handle_post_status_transition' ), 10, 3 );
+		add_action( 'post_updated', array( $this, 'handle_post_update' ), 10, 3 );
+		add_action( 'updated_post_meta', array( $this, 'handle_meta_update' ), 10, 4 );
 	}
 
 	/**
 	 * Handle post status transition.
 	 * 
-	 * Triggers notification when a post is published.
+	 * Triggers notification when a post is published or status changes.
+	 * Handles BOTH built-in scenarios and custom scenarios with on_publish/on_status_change triggers.
 	 *
 	 * @param string  $new_status New post status.
 	 * @param string  $old_status Old post status.
 	 * @param WP_Post $post       Post object.
 	 */
-	public function handle_post_publish( $new_status, $old_status, $post ) {
-		// Only proceed if transitioning to publish.
-		if ( 'publish' !== $new_status || 'publish' === $old_status ) {
+	public function handle_post_status_transition( $new_status, $old_status, $post ) {
+		// Built-in Scenario 1: Publication (draft/pending/future -> publish)
+		if ( 'publish' === $new_status && 'publish' !== $old_status ) {
+			// Trigger built-in publication scenario
+			$this->trigger_scenario( 'publication', $post );
+			
+			// Trigger custom scenarios with 'on_publish' trigger
+			$this->trigger_custom_scenarios( 'on_publish', $post );
 			return;
 		}
 
+		// Built-in Scenario 2: Status change for already published posts
+		if ( 'publish' === $old_status && 'publish' !== $new_status ) {
+			// Post was unpublished or status changed
+			$this->trigger_scenario( 'status_change', $post, array(
+				'status_label' => $new_status,
+			) );
+			
+			// Trigger custom scenarios with 'on_status_change' trigger
+			$this->trigger_custom_scenarios( 'on_status_change', $post, array(
+				'status_label' => $new_status,
+			) );
+		}
+	}
+
+	/**
+	 * Handle post update (for major updates).
+	 * Handles BOTH built-in major_update scenario and custom scenarios with on_update trigger.
+	 * 
+	 * @param int     $post_id      Post ID.
+	 * @param WP_Post $post_after   Post object after update.
+	 * @param WP_Post $post_before  Post object before update.
+	 */
+	public function handle_post_update( $post_id, $post_after, $post_before ) {
+		// Only for published posts being updated
+		if ( 'publish' !== $post_after->post_status ) {
+			return;
+		}
+
+		// Built-in major_update scenario: Check if major_update flag is set
+		$major_update = get_post_meta( $post_id, 'major_update', true );
+		if ( ! empty( $major_update ) ) {
+			$this->trigger_scenario( 'major_update', $post_after );
+			// Clear the flag after sending
+			delete_post_meta( $post_id, 'major_update' );
+		}
+		
+		// Trigger custom scenarios with 'on_update' trigger
+		$this->trigger_custom_scenarios( 'on_update', $post_after );
+	}
+
+	/**
+	 * Handle post meta update (for status changes via meta).
+	 * Handles BOTH built-in scenarios configured with meta_key and custom scenarios with on_meta_change trigger.
+	 * 
+	 * @param int    $meta_id    ID of updated metadata entry.
+	 * @param int    $post_id    Post ID.
+	 * @param string $meta_key   Meta key.
+	 * @param mixed  $meta_value Meta value.
+	 */
+	public function handle_meta_update( $meta_id, $post_id, $meta_key, $meta_value ) {
+		$post = get_post( $post_id );
+		if ( ! $post || 'publish' !== $post->post_status ) {
+			return;
+		}
+
+		// Detect which built-in scenarios should trigger based on their configured meta_key
+		$this->trigger_scenarios_by_meta_key( $meta_key, $post, $meta_value );
+		
+		// Trigger custom scenarios with 'on_meta_change' trigger for this specific meta_key
+		$this->trigger_custom_scenarios( 'on_meta_change', $post, array(
+			'meta_key' => $meta_key,
+			'meta_value' => $meta_value,
+		) );
+	}
+
+	/**
+	 * Trigger built-in scenarios that are configured to watch a specific meta_key.
+	 * Scans all enabled scenarios for the post type and triggers those where the configured
+	 * meta_key matches the changed meta_key.
+	 * 
+	 * @param string  $meta_key   The meta key that changed.
+	 * @param WP_Post $post       Post object.
+	 * @param mixed   $meta_value The new meta value.
+	 */
+	private function trigger_scenarios_by_meta_key( $meta_key, $post, $meta_value ) {
 		// Check if push is enabled globally.
 		$config = $this->get_config();
 		if ( ! $config->is_push_enabled() ) {
@@ -79,28 +162,190 @@ class Custom_PWA_Dispatcher {
 			return;
 		}
 
-		// Check if push is enabled for this specific post type.
-		$push_settings = $this->get_push_settings();
-		if ( ! $push_settings->is_enabled_for_post_type( $post->post_type ) ) {
+		// Load required classes.
+		require_once plugin_dir_path( __FILE__ ) . 'class-push-rules.php';
+
+		// Get the rules for this post type.
+		$rules = Custom_PWA_Push_Rules::get_post_type_rules( $post->post_type );
+		if ( ! $rules || empty( $rules['scenarios'] ) ) {
 			return;
 		}
 
-		// Get the rule for this post type.
-		$rule = $push_settings->get_rule( $post->post_type );
-		if ( ! $rule ) {
+		// Loop through all scenarios and check if any have a matching meta_key field.
+		foreach ( $rules['scenarios'] as $scenario_key => $scenario ) {
+			// Skip disabled scenarios.
+			if ( empty( $scenario['enabled'] ) ) {
+				continue;
+			}
+
+			// Check if this scenario has fields configuration.
+			if ( empty( $scenario['fields'] ) || ! is_array( $scenario['fields'] ) ) {
+				continue;
+			}
+
+			// Check if scenario has a meta_key field configured that matches.
+			if ( isset( $scenario['fields']['meta_key'] ) && $scenario['fields']['meta_key'] === $meta_key ) {
+				// Trigger this scenario with the meta value as context.
+				$this->trigger_scenario( $scenario_key, $post, array(
+					'meta_key' => $meta_key,
+					'meta_value' => $meta_value,
+					'status_label' => $meta_value, // For status_change scenario compatibility
+				) );
+				
+				$this->log( sprintf( 'Triggered scenario "%s" for meta_key "%s" change (value: %s)', $scenario_key, $meta_key, $meta_value ) );
+			}
+		}
+	}
+
+	/**
+	 * Trigger a specific scenario for a post.
+	 * 
+	 * @param string  $scenario_key Scenario key (publication, major_update, status_change).
+	 * @param WP_Post $post         Post object.
+	 * @param array   $extra_context Additional context variables.
+	 */
+	private function trigger_scenario( $scenario_key, $post, $extra_context = array() ) {
+		// Check if push is enabled globally.
+		$config = $this->get_config();
+		if ( ! $config->is_push_enabled() ) {
 			return;
 		}
+
+		// Check if this post type is enabled.
+		$enabled_post_types = $config->get_enabled_post_types();
+		if ( ! in_array( $post->post_type, $enabled_post_types, true ) ) {
+			return;
+		}
+
+		// Load required classes.
+		require_once plugin_dir_path( __FILE__ ) . 'class-push-rules.php';
+
+		// Get the rules for this post type (includes config + scenarios).
+		$rules = Custom_PWA_Push_Rules::get_post_type_rules( $post->post_type );
+		if ( ! $rules ) {
+			return;
+		}
+
+		// Check if push is enabled for this specific post type.
+		if ( empty( $rules['config']['enabled'] ) ) {
+			return;
+		}
+
+		// Check if the scenario exists and is enabled.
+		if ( empty( $rules['scenarios'][ $scenario_key ] ) || empty( $rules['scenarios'][ $scenario_key ]['enabled'] ) ) {
+			$this->log( sprintf( 'Scenario "%s" not enabled for post type: %s', $scenario_key, $post->post_type ) );
+			return;
+		}
+
+		$scenario = $rules['scenarios'][ $scenario_key ];
 
 		// Build notification context.
-		$context = $this->build_context( $post );
+		$context = array_merge( $this->build_context( $post ), $extra_context );
 
-		// Render templates.
-		$title = $this->render_template( $rule['title'], $context );
-		$body  = $this->render_template( $rule['body'], $context );
-		$url   = $this->render_template( $rule['url'], $context );
+		// Render templates from the scenario.
+		$title = $this->render_template( $scenario['title_template'], $context );
+		$body  = $this->render_template( $scenario['body_template'], $context );
+		$url   = $this->render_template( $scenario['url_template'], $context );
 
 		// Dispatch notification.
 		$this->dispatch_notification( $title, $body, $url, $post );
+	}
+
+	/**
+	 * Trigger custom scenarios for a post based on trigger type.
+	 * 
+	 * Finds and executes all enabled custom scenarios that match:
+	 * - The trigger type (on_publish, on_update, on_meta_change, on_status_change)
+	 * - The post type (if scenario is post-type specific)
+	 * - Additional conditions (like meta_key for on_meta_change)
+	 * 
+	 * @param string  $trigger_type  Trigger type (on_publish, on_update, on_meta_change, on_status_change).
+	 * @param WP_Post $post          Post object.
+	 * @param array   $extra_context Additional context variables (meta_key, meta_value, status_label, etc.).
+	 */
+	private function trigger_custom_scenarios( $trigger_type, $post, $extra_context = array() ) {
+		// Check if push is enabled globally.
+		$config = $this->get_config();
+		if ( ! $config->is_push_enabled() ) {
+			return;
+		}
+
+		// Check if this post type is enabled.
+		$enabled_post_types = $config->get_enabled_post_types();
+		if ( ! in_array( $post->post_type, $enabled_post_types, true ) ) {
+			return;
+		}
+
+		// Load required classes.
+		require_once plugin_dir_path( __FILE__ ) . 'class-push-rules.php';
+		require_once plugin_dir_path( __FILE__ ) . 'class-custom-scenarios.php';
+
+		// Get all custom scenarios.
+		$custom_scenarios = Custom_PWA_Custom_Scenarios::get_all();
+		if ( empty( $custom_scenarios ) ) {
+			return;
+		}
+
+		// Get rules for this post type to check which scenarios are enabled.
+		$rules = Custom_PWA_Push_Rules::get_post_type_rules( $post->post_type );
+		if ( ! $rules || empty( $rules['config']['enabled'] ) ) {
+			return;
+		}
+
+		// Loop through custom scenarios.
+		foreach ( $custom_scenarios as $scenario_id => $scenario_def ) {
+			// Check if scenario's trigger type matches.
+			if ( empty( $scenario_def['trigger']['type'] ) || $scenario_def['trigger']['type'] !== $trigger_type ) {
+				continue;
+			}
+
+			// Check if scenario applies to this post type.
+			if ( $scenario_def['scope'] === 'post_type' ) {
+				if ( empty( $scenario_def['post_types'] ) || ! in_array( $post->post_type, $scenario_def['post_types'], true ) ) {
+					continue; // Scenario doesn't apply to this post type.
+				}
+			}
+			// If scope is 'global', it applies to all post types.
+
+			// For on_meta_change: check if meta_key matches.
+			if ( $trigger_type === 'on_meta_change' ) {
+				$scenario_meta_key = isset( $scenario_def['trigger']['meta_key'] ) ? $scenario_def['trigger']['meta_key'] : '';
+				$changed_meta_key = isset( $extra_context['meta_key'] ) ? $extra_context['meta_key'] : '';
+				
+				if ( empty( $scenario_meta_key ) || $scenario_meta_key !== $changed_meta_key ) {
+					continue; // Meta key doesn't match.
+				}
+			}
+
+			// Check if scenario is enabled in post type rules.
+			if ( empty( $rules['scenarios'][ $scenario_id ] ) || empty( $rules['scenarios'][ $scenario_id ]['enabled'] ) ) {
+				$this->log( sprintf( 'Custom scenario "%s" (%s) not enabled for post type: %s', $scenario_id, $trigger_type, $post->post_type ) );
+				continue;
+			}
+
+			// Get the enabled scenario config (with templates).
+			$scenario_config = $rules['scenarios'][ $scenario_id ];
+
+			// Build notification context.
+			$context = array_merge( $this->build_context( $post ), $extra_context );
+			
+			// Add any additional meta values as context.
+			if ( ! empty( $scenario_def['fields_used']['meta_keys'] ) ) {
+				foreach ( $scenario_def['fields_used']['meta_keys'] as $meta_key ) {
+					$context[ $meta_key ] = get_post_meta( $post->ID, $meta_key, true );
+				}
+			}
+
+			// Render templates from the scenario.
+			$title = $this->render_template( $scenario_config['title_template'], $context );
+			$body  = $this->render_template( $scenario_config['body_template'], $context );
+			$url   = $this->render_template( $scenario_config['url_template'], $context );
+
+			$this->log( sprintf( 'Triggering custom scenario "%s" (%s) for post #%d: %s', $scenario_id, $trigger_type, $post->ID, $post->post_title ) );
+
+			// Dispatch notification.
+			$this->dispatch_notification( $title, $body, $url, $post );
+		}
 	}
 
 	/**

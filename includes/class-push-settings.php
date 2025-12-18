@@ -463,6 +463,59 @@ class Custom_PWA_Push_Settings {
 						<?php
 						break;
 
+					case 'meta_key_select':
+						// Get all meta keys for this post type
+						$meta_keys = $this->get_post_type_meta_keys( $post_type );
+						?>
+						<select id="<?php echo esc_attr( $field_id ); ?>" 
+							name="<?php echo esc_attr( $field_name ); ?>" 
+							class="regular-text">
+							<option value=""><?php esc_html_e( '-- Select a meta field --', 'custom-pwa' ); ?></option>
+							
+							<?php if ( ! empty( $field_config['default'] ) ) : ?>
+								<optgroup label="<?php esc_attr_e( 'Suggested', 'custom-pwa' ); ?>">
+									<option value="<?php echo esc_attr( $field_config['default'] ); ?>" 
+										<?php selected( $field_value, $field_config['default'] ); ?>>
+										<?php echo esc_html( $field_config['default'] ); ?> 
+										<?php esc_html_e( '(default)', 'custom-pwa' ); ?>
+									</option>
+								</optgroup>
+							<?php endif; ?>
+							
+							<?php if ( ! empty( $meta_keys ) ) : ?>
+								<optgroup label="<?php esc_attr_e( 'Available Meta Keys', 'custom-pwa' ); ?>">
+									<?php foreach ( $meta_keys as $meta_key ) : ?>
+										<?php if ( $meta_key !== $field_config['default'] ) : ?>
+											<option value="<?php echo esc_attr( $meta_key ); ?>" 
+												<?php selected( $field_value, $meta_key ); ?>>
+												<?php echo esc_html( $meta_key ); ?>
+											</option>
+										<?php endif; ?>
+									<?php endforeach; ?>
+								</optgroup>
+							<?php endif; ?>
+							
+							<optgroup label="<?php esc_attr_e( 'Custom', 'custom-pwa' ); ?>">
+								<option value="<?php echo esc_attr( $field_value ); ?>" 
+									<?php selected( ! empty( $field_value ) && ! in_array( $field_value, $meta_keys, true ) && $field_value !== $field_config['default'] ); ?>>
+									<?php echo esc_html( $field_value ); ?>
+								</option>
+							</optgroup>
+						</select>
+						<p class="description">
+							<?php esc_html_e( 'Or enter custom:', 'custom-pwa' ); ?> 
+							<input type="text" 
+								id="<?php echo esc_attr( $field_id ); ?>-custom" 
+								class="regular-text" 
+								placeholder="<?php esc_attr_e( 'Enter custom meta key', 'custom-pwa' ); ?>"
+								style="margin-top: 5px;"
+								data-target="<?php echo esc_attr( $field_id ); ?>"
+								onchange="document.getElementById('<?php echo esc_attr( $field_id ); ?>').value = this.value;"
+							/>
+						</p>
+						<?php
+						break;
+
 					case 'text':
 					default:
 						?>
@@ -483,6 +536,51 @@ class Custom_PWA_Push_Settings {
 			</td>
 		</tr>
 		<?php
+	}
+
+	/**
+	 * Get all meta keys used in a post type.
+	 * 
+	 * Queries the database to find all unique meta keys that have been
+	 * used with posts of the specified post type.
+	 *
+	 * @param string $post_type Post type name.
+	 * @return array Array of meta key names.
+	 */
+	private function get_post_type_meta_keys( $post_type ) {
+		global $wpdb;
+		
+		// Get all meta keys for this post type
+		$meta_keys = $wpdb->get_col( $wpdb->prepare(
+			"SELECT DISTINCT pm.meta_key 
+			FROM {$wpdb->postmeta} pm
+			INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+			WHERE p.post_type = %s
+			AND pm.meta_key NOT LIKE '\\_%%'
+			ORDER BY pm.meta_key ASC
+			LIMIT 100",
+			$post_type
+		) );
+		
+		// Add common WooCommerce meta keys if post type is 'product'
+		if ( 'product' === $post_type ) {
+			$common_wc_keys = array( '_price', '_regular_price', '_sale_price', '_stock', '_stock_status', '_manage_stock' );
+			$meta_keys = array_unique( array_merge( $common_wc_keys, $meta_keys ) );
+			sort( $meta_keys );
+		}
+		
+		// Add common ACF meta keys patterns
+		$acf_keys = array_filter( $meta_keys, function( $key ) {
+			return strpos( $key, 'field_' ) !== 0; // Exclude ACF internal keys
+		} );
+		
+		/**
+		 * Filter meta keys available for scenario configuration.
+		 * 
+		 * @param array  $meta_keys Array of meta key names.
+		 * @param string $post_type Post type name.
+		 */
+		return apply_filters( 'custom_pwa_scenario_meta_keys', $acf_keys, $post_type );
 	}
 
 	/**

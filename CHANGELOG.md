@@ -5,6 +5,28 @@ All notable changes to the Custom PWA plugin will be documented in this file.
 ## [1.0.4] - 2025-12-18
 
 ### Added
+- **Meta Key Selector in Scenarios**: Intelligent UI for configuring meta field triggers
+  - **Dropdown selection**: Choose from real database meta keys instead of typing manually
+  - **Three optgroups**:
+    - "Suggested": Default meta key recommended for the scenario
+    - "Available Meta Keys": All meta keys found in database for the post type
+    - "Custom": Text input for custom meta keys
+  - **Database query**: `get_post_type_meta_keys()` method queries actual postmeta table
+  - **Smart filtering**: 
+    - Excludes WordPress internal keys (starting with _)
+    - Filters out ACF internal keys (field_*)
+    - Adds common WooCommerce keys for products (_price, _stock, _stock_status, etc.)
+    - Limits to 100 keys for performance
+  - **New field type**: `meta_key_select` with dropdown + custom text input
+  - **Applied to all meta-based scenarios**: major_update, featured, sales_open, sold_out, cancelled, rescheduled, price_drop, back_in_stock, out_of_stock, low_stock, end_of_life, status_change
+  - **Benefits**: Reduces configuration errors, improves discoverability, maintains flexibility
+- **Dynamic Meta Key Detection in Dispatcher**: Intelligent scenario triggering
+  - **New method**: `trigger_scenarios_by_meta_key()` scans all enabled scenarios
+  - **Automatic matching**: When a meta field updates, dispatcher checks which scenarios are configured to watch that field
+  - **Example**: If "Price Drop" scenario configured with `_price`, it triggers only when `_price` changes
+  - **Context enrichment**: Adds `{meta_key}` and `{meta_value}` placeholders to all meta-triggered notifications
+  - **Backward compatible**: Maintains `{status_label}` for status_change scenarios
+  - **Multi-scenario support**: Multiple scenarios can watch the same meta key
 - **Custom Scenarios Management**: User-defined push notification scenarios
   - New "Manage Scenarios" tab in Custom PWA → Push admin page
   - Full CRUD interface for creating, editing, and deleting scenarios
@@ -24,6 +46,29 @@ All notable changes to the Custom PWA plugin will be documented in this file.
   - Automatically converts to new format on first load
   - Preserves custom templates from old format in first scenario
   - Prevents "Impossible de charger" errors on upgrade
+- **Multi-Scenario Dispatcher**: Complete notification triggering system
+  - **Publication scenario**: Triggered when post transitions from draft/pending to publish
+  - **Major Update scenario**: Triggered when configured meta field is updated
+  - **Status Change scenario**: Triggered when configured meta field changes
+  - **Custom scenarios support**: ALL custom scenarios created in "Manage Scenarios" are automatically triggered
+  - Automatic detection and execution of enabled scenarios
+  - Each scenario can be enabled/disabled independently per post type
+  - Template rendering with placeholder replacement for each scenario
+  - Built-in and custom scenarios execute in parallel when conditions match
+  - Support for 4 trigger types in custom scenarios:
+    - `on_publish`: Triggered on first publication
+    - `on_update`: Triggered on any update to published post
+    - `on_meta_change`: Triggered when specific meta field changes (requires meta_key match)
+    - `on_status_change`: Triggered when WordPress post status changes
+  - Custom scenarios can be global (all post types) or post-type specific
+  - Meta field values automatically added to notification context for custom scenarios
+- **Documentation**: Complete scenarios usage guide
+  - New `SCENARIOS-USAGE.md` file with detailed examples
+  - **Meta key selector section**: How to use dropdown to configure scenarios
+  - Explains when each scenario is triggered
+  - Code examples for adding meta boxes in WordPress editor
+  - Placeholder reference guide
+  - Real-world use cases (blog, e-commerce, events, news)
 
 ### Fixed
 - **Page Load Error**: Fixed "Impossible de charger custom-pwa-push" fatal error

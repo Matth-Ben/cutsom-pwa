@@ -60,9 +60,9 @@ class Custom_PWA_Push_Scenarios {
 						'default_url'   => '{permalink}',
 						'fields'        => array(
 							'meta_key' => array(
-								'type'        => 'text',
+								'type'        => 'meta_key_select',
 								'label'       => __( 'Major Update Meta Key', 'custom-pwa' ),
-								'description' => __( 'Custom field name that triggers this notification (e.g., "major_update").', 'custom-pwa' ),
+								'description' => __( 'Select the meta field that triggers this notification (e.g., "major_update").', 'custom-pwa' ),
 								'default'     => 'major_update',
 							),
 						),
@@ -76,9 +76,9 @@ class Custom_PWA_Push_Scenarios {
 						'default_url'   => '{permalink}',
 						'fields'        => array(
 							'meta_key' => array(
-								'type'        => 'text',
+								'type'        => 'meta_key_select',
 								'label'       => __( 'Featured Meta Key', 'custom-pwa' ),
-								'description' => __( 'Custom field name for featured status (e.g., "is_featured").', 'custom-pwa' ),
+								'description' => __( 'Select the meta field for featured status (e.g., "is_featured").', 'custom-pwa' ),
 								'default'     => 'is_featured',
 							),
 						),
@@ -107,9 +107,9 @@ class Custom_PWA_Push_Scenarios {
 						'default_url'   => '{permalink}',
 						'fields'        => array(
 							'meta_key' => array(
-								'type'        => 'text',
+								'type'        => 'meta_key_select',
 								'label'       => __( 'Sales Status Meta Key', 'custom-pwa' ),
-								'description' => __( 'Custom field name for sales status (e.g., "sales_status").', 'custom-pwa' ),
+								'description' => __( 'Select the meta field for sales status (e.g., "sales_status").', 'custom-pwa' ),
 								'default'     => 'sales_status',
 							),
 						),
@@ -129,9 +129,9 @@ class Custom_PWA_Push_Scenarios {
 								'default'     => 50,
 							),
 							'meta_key' => array(
-								'type'        => 'text',
+								'type'        => 'meta_key_select',
 								'label'       => __( 'Tickets Remaining Meta Key', 'custom-pwa' ),
-								'description' => __( 'Custom field name for remaining tickets count.', 'custom-pwa' ),
+								'description' => __( 'Select the meta field for remaining tickets count.', 'custom-pwa' ),
 								'default'     => 'tickets_remaining',
 							),
 						),
@@ -145,9 +145,9 @@ class Custom_PWA_Push_Scenarios {
 						'default_url'   => '{permalink}',
 						'fields'        => array(
 							'meta_key' => array(
-								'type'        => 'text',
+								'type'        => 'meta_key_select',
 								'label'       => __( 'Sold Out Status Meta Key', 'custom-pwa' ),
-								'description' => __( 'Custom field name for sold out status.', 'custom-pwa' ),
+								'description' => __( 'Select the meta field for sold out status.', 'custom-pwa' ),
 								'default'     => 'is_sold_out',
 							),
 						),
@@ -161,9 +161,9 @@ class Custom_PWA_Push_Scenarios {
 						'default_url'   => '{permalink}',
 						'fields'        => array(
 							'meta_key' => array(
-								'type'        => 'text',
+								'type'        => 'meta_key_select',
 								'label'       => __( 'Cancelled Status Meta Key', 'custom-pwa' ),
-								'description' => __( 'Custom field name for cancelled status.', 'custom-pwa' ),
+								'description' => __( 'Select the meta field for cancelled status.', 'custom-pwa' ),
 								'default'     => 'is_cancelled',
 							),
 						),
@@ -177,9 +177,9 @@ class Custom_PWA_Push_Scenarios {
 						'default_url'   => '{permalink}',
 						'fields'        => array(
 							'meta_key' => array(
-								'type'        => 'text',
+								'type'        => 'meta_key_select',
 								'label'       => __( 'Event Date Meta Key', 'custom-pwa' ),
-								'description' => __( 'Custom field name for event date.', 'custom-pwa' ),
+								'description' => __( 'Select the meta field for event date.', 'custom-pwa' ),
 								'default'     => 'event_date',
 							),
 						),
@@ -224,9 +224,9 @@ class Custom_PWA_Push_Scenarios {
 						'default_url'   => '{permalink}',
 						'fields'        => array(
 							'meta_key' => array(
-								'type'        => 'text',
+								'type'        => 'meta_key_select',
 								'label'       => __( 'Price Meta Key', 'custom-pwa' ),
-								'description' => __( 'Custom field name for product price.', 'custom-pwa' ),
+								'description' => __( 'Select the meta field for product price.', 'custom-pwa' ),
 								'default'     => '_price',
 							),
 						),
@@ -240,9 +240,9 @@ class Custom_PWA_Push_Scenarios {
 						'default_url'   => '{permalink}',
 						'fields'        => array(
 							'meta_key' => array(
-								'type'        => 'text',
+								'type'        => 'meta_key_select',
 								'label'       => __( 'Stock Status Meta Key', 'custom-pwa' ),
-								'description' => __( 'Custom field name for stock status.', 'custom-pwa' ),
+								'description' => __( 'Select the meta field for stock status.', 'custom-pwa' ),
 								'default'     => '_stock_status',
 							),
 						),
@@ -256,9 +256,9 @@ class Custom_PWA_Push_Scenarios {
 						'default_url'   => '{permalink}',
 						'fields'        => array(
 							'meta_key' => array(
-								'type'        => 'text',
+								'type'        => 'meta_key_select',
 								'label'       => __( 'Stock Status Meta Key', 'custom-pwa' ),
-								'description' => __( 'Custom field name for stock status.', 'custom-pwa' ),
+								'description' => __( 'Select the meta field for stock status.', 'custom-pwa' ),
 								'default'     => '_stock_status',
 							),
 						),
@@ -278,9 +278,9 @@ class Custom_PWA_Push_Scenarios {
 								'default'     => 5,
 							),
 							'meta_key' => array(
-								'type'        => 'text',
+								'type'        => 'meta_key_select',
 								'label'       => __( 'Stock Quantity Meta Key', 'custom-pwa' ),
-								'description' => __( 'Custom field name for stock quantity.', 'custom-pwa' ),
+								'description' => __( 'Select the meta field for stock quantity.', 'custom-pwa' ),
 								'default'     => '_stock',
 							),
 						),
@@ -294,9 +294,9 @@ class Custom_PWA_Push_Scenarios {
 						'default_url'   => '{permalink}',
 						'fields'        => array(
 							'meta_key' => array(
-								'type'        => 'text',
+								'type'        => 'meta_key_select',
 								'label'       => __( 'EOL Status Meta Key', 'custom-pwa' ),
-								'description' => __( 'Custom field name for end-of-life status.', 'custom-pwa' ),
+								'description' => __( 'Select the meta field for end-of-life status.', 'custom-pwa' ),
 								'default'     => 'is_discontinued',
 							),
 						),
@@ -325,9 +325,9 @@ class Custom_PWA_Push_Scenarios {
 						'default_url'   => '{permalink}',
 						'fields'        => array(
 							'meta_key' => array(
-								'type'        => 'text',
+								'type'        => 'meta_key_select',
 								'label'       => __( 'Update Trigger Meta Key', 'custom-pwa' ),
-								'description' => __( 'Custom field name that triggers this notification.', 'custom-pwa' ),
+								'description' => __( 'Select the meta field that triggers this notification.', 'custom-pwa' ),
 								'default'     => 'major_update',
 							),
 						),
@@ -341,9 +341,9 @@ class Custom_PWA_Push_Scenarios {
 						'default_url'   => '{permalink}',
 						'fields'        => array(
 							'meta_key' => array(
-								'type'        => 'text',
+								'type'        => 'meta_key_select',
 								'label'       => __( 'Status Meta Key', 'custom-pwa' ),
-								'description' => __( 'Custom field name for status.', 'custom-pwa' ),
+								'description' => __( 'Select the meta field for status.', 'custom-pwa' ),
 								'default'     => 'status',
 							),
 						),
