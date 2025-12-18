@@ -1,0 +1,622 @@
+/* Custom PWA Admin Styles — clean, minimal, shadcn-like
+ * Primary color: #6F38C7 (purple)
+ * - Soft rounded cards
+ * - Subtle shadows
+ * - Clear form layout
+ * - Harmonized buttons and inputs
+ */
+:root{
+  --cp-bg:#ffffff;
+  --cp-muted:#6b7280; /* gray-500 */
+  --cp-border:#e5e7eb; /* gray-200 */
+  --cp-accent:#6F38C7; /* purple primary */
+  --cp-accent-hover:#5a2da3;
+  --cp-accent-light:#f3edff;
+  --cp-accent-foreground:#ffffff;
+  --cp-radius:10px;
+  --cp-shadow:0 6px 18px rgba(111,56,199,0.08);
+  --cp-gap:20px;
+  --cp-max-width:1200px;
+}
+
+body.wp-admin .wrap{background:var(--cp-bg);}
+
+.custom-pwa-title{
+  font-size:28px;
+  font-weight:700;
+  color:#0f172a;
+  margin-bottom:8px;
+}
+
+.custom-pwa-subtitle{
+  font-size:14px;
+  color:var(--cp-muted);
+  margin-bottom:24px;
+}
+
+.custom-pwa-admin-container{
+  max-width:var(--cp-max-width);
+  margin:18px auto 60px;
+  padding:18px;
+}
+
+/* ====================
+   Tabs Navigation
+   ==================== */
+.custom-pwa-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--cp-border);
+}
+
+.custom-pwa-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--cp-muted);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s ease;
+  background: transparent;
+  border-radius: 6px 6px 0 0;
+}
+
+.custom-pwa-tab:hover {
+  color: var(--cp-accent);
+  background: var(--cp-accent-light);
+}
+
+.custom-pwa-tab.active {
+  color: var(--cp-accent);
+  border-bottom-color: var(--cp-accent);
+  background: transparent;
+  font-weight: 600;
+}
+
+.custom-pwa-tab .dashicons {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.custom-pwa-grid{
+  display:grid;
+  grid-template-columns: 280px 1fr;
+  gap:var(--cp-gap);
+  align-items:start;
+}
+
+.custom-pwa-card{
+  background:var(--cp-bg);
+  border:1px solid var(--cp-border);
+  border-radius:var(--cp-radius);
+  box-shadow:var(--cp-shadow);
+  padding:18px;
+}
+
+.custom-pwa-card h2{
+  margin:0 0 16px 0;
+  font-size:18px;
+  color:#0f172a;
+  font-weight:600;
+  padding-bottom:12px;
+  border-bottom:2px solid var(--cp-accent-light);
+}
+
+.custom-pwa-card h3{
+  margin:16px 0 10px 0;
+  font-size:15px;
+  color:#374151;
+  font-weight:600;
+}
+
+.custom-pwa-section{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.custom-pwa-row{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.custom-pwa-label{
+  font-size:13px;
+  color:var(--cp-muted);
+  min-width:130px;
+}
+
+.custom-pwa-input{
+  flex:1;
+}
+
+.custom-pwa-input input[type="text"],
+.custom-pwa-input select,
+.custom-pwa-input textarea{
+  width:100%;
+  border:1px solid var(--cp-border);
+  border-radius:8px;
+  padding:10px 12px;
+  font-size:14px;
+  color:#0f172a;
+  background:#fff;
+  transition:all 0.2s ease;
+}
+
+.custom-pwa-input input[type="text"]:focus,
+.custom-pwa-input select:focus,
+.custom-pwa-input textarea:focus{
+  border-color:var(--cp-accent);
+  outline:none;
+  box-shadow:0 0 0 3px rgba(111,56,199,0.1);
+}
+
+.custom-pwa-input input[type="checkbox"]{
+  accent-color:var(--cp-accent);
+  width:18px;
+  height:18px;
+  cursor:pointer;
+}
+
+.custom-pwa-help{
+  font-size:12px;
+  color:var(--cp-muted);
+}
+
+.custom-pwa-actions{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+
+.button.cp-btn{
+  background:var(--cp-accent);
+  color:var(--cp-accent-foreground);
+  border:0;
+  padding:10px 16px;
+  border-radius:8px;
+  box-shadow:0 4px 12px rgba(111,56,199,0.2);
+  font-weight:500;
+  transition:all 0.2s ease;
+}
+
+.button.cp-btn:hover{
+  background:var(--cp-accent-hover);
+  transform:translateY(-1px);
+  box-shadow:0 6px 16px rgba(111,56,199,0.3);
+}
+
+.button.cp-btn.secondary{
+  background:transparent;
+  color:var(--cp-accent);
+  border:1px solid var(--cp-border);
+  box-shadow:none;
+}
+
+.button.cp-btn.secondary:hover{
+  background:var(--cp-accent-light);
+  border-color:var(--cp-accent);
+  transform:translateY(-1px);
+}
+
+.notice.notice-warning.custom-pwa-notice{
+  border-left-color:var(--cp-accent);
+}
+
+/* Sidebar for Push page */
+.custom-pwa-sidebar{
+  background:var(--cp-bg);
+  border:1px solid var(--cp-border);
+  border-radius:var(--cp-radius);
+  box-shadow:var(--cp-shadow);
+  padding:18px;
+  position:sticky;
+  top:32px;
+}
+
+.custom-pwa-sidebar h3{
+  margin:0 0 12px 0;
+  font-size:15px;
+  color:#0f172a;
+  font-weight:600;
+}
+
+.custom-pwa-sidebar-list{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.custom-pwa-sidebar-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 12px;
+  background:#fff;
+  border-radius:6px;
+  font-size:13px;
+  color:#0f172a;
+  border:1px solid var(--cp-border);
+  transition:all 0.2s ease;
+}
+
+.custom-pwa-sidebar-item:hover{
+  background:var(--cp-accent-light);
+  border-color:var(--cp-accent);
+  transform:translateX(2px);
+}
+
+.custom-pwa-sidebar-item.active{
+  background:var(--cp-accent);
+  color:#fff;
+  border-color:var(--cp-accent);
+  box-shadow:0 4px 12px rgba(111,56,199,0.2);
+}
+
+.custom-pwa-sidebar-item.active .dashicons{
+  color:#fff;
+}
+
+.custom-pwa-sidebar-item[data-cpt="test-notification"]{
+  background:linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+  border-color:#c7d2fe;
+}
+
+.custom-pwa-sidebar-item[data-cpt="test-notification"]:hover{
+  background:linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+}
+
+.custom-pwa-sidebar-item[data-cpt="test-notification"].active{
+  background:var(--cp-accent);
+  border-color:var(--cp-accent);
+}
+
+.custom-pwa-sidebar-item .dashicons{
+  color:var(--cp-accent);
+  font-size:16px;
+  width:16px;
+  height:16px;
+  transition:all 0.2s ease;
+}
+
+.custom-pwa-sidebar-empty{
+  color:var(--cp-muted);
+  font-size:13px;
+  font-style:italic;
+  padding:12px;
+  text-align:center;
+  background:#f9fafb;
+  border-radius:6px;
+}
+
+.custom-pwa-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:4px 10px;
+  background:var(--cp-accent-light);
+  color:var(--cp-accent);
+  border-radius:4px;
+  font-size:12px;
+  font-weight:500;
+  margin-left:8px;
+}
+
+/* WordPress form tables inside cards */
+.custom-pwa-card .form-table th{
+  font-weight:500;
+  color:#374151;
+  padding:12px 0;
+}
+
+.custom-pwa-card .form-table td{
+  padding:12px 0;
+}
+
+.custom-pwa-card .form-table input[type="text"],
+.custom-pwa-card .form-table input[type="url"],
+.custom-pwa-card .form-table input[type="email"],
+.custom-pwa-card .form-table select,
+.custom-pwa-card .form-table textarea{
+  border:1px solid var(--cp-border);
+  border-radius:8px;
+  padding:10px 12px;
+  transition:all 0.2s ease;
+}
+
+.custom-pwa-card .form-table input[type="text"]:focus,
+.custom-pwa-card .form-table input[type="url"]:focus,
+.custom-pwa-card .form-table input[type="email"]:focus,
+.custom-pwa-card .form-table select:focus,
+.custom-pwa-card .form-table textarea:focus{
+  border-color:var(--cp-accent);
+  outline:none;
+  box-shadow:0 0 0 3px rgba(111,56,199,0.1);
+}
+
+.custom-pwa-card .form-table input[type="checkbox"]{
+  accent-color:var(--cp-accent);
+  width:18px;
+  height:18px;
+  cursor:pointer;
+}
+
+.custom-pwa-card .submit{
+  margin:0;
+  padding:16px 0 0 0;
+  border-top:1px solid var(--cp-border);
+}
+
+/* Links */
+.custom-pwa-card a{
+  color:var(--cp-accent);
+  text-decoration:none;
+  transition:all 0.2s ease;
+}
+
+.custom-pwa-card a:hover{
+  color:var(--cp-accent-hover);
+  text-decoration:underline;
+}
+
+/* Description text */
+.custom-pwa-card .description,
+.custom-pwa-card p.description{
+  color:var(--cp-muted);
+  font-size:13px;
+  margin-top:4px;
+}
+
+/* CPT Cards (individual post type configs) */
+.custom-pwa-cpt-card{
+  background:var(--cp-bg);
+  border:1px solid var(--cp-border);
+  border-radius:var(--cp-radius);
+  box-shadow:var(--cp-shadow);
+  padding:20px;
+}
+
+/* Success/error messages */
+.custom-pwa-card .notice{
+  border-left:4px solid var(--cp-accent);
+  margin:16px 0;
+}
+
+/* Menu icon color */
+#adminmenu #toplevel_page_custom-pwa .wp-menu-image:before{
+  color:var(--cp-accent);
+}
+
+#adminmenu #toplevel_page_custom-pwa:hover .wp-menu-image:before,
+#adminmenu #toplevel_page_custom-pwa.current .wp-menu-image:before{
+  color:var(--cp-accent-hover);
+}
+
+@media (max-width:900px){
+  .custom-pwa-grid{grid-template-columns:1fr;}
+  .custom-pwa-sidebar{position:static;}
+}
+
+/* ==========================================================================
+   Scenario Accordion/Panels Styles (NEW)
+   ========================================================================== */
+
+/* Main content area for post type config */
+.custom-pwa-push-main {
+  display: none; /* Hidden by default, shown by JS */
+}
+
+/* Config section */
+.custom-pwa-config-section {
+  background: var(--cp-bg);
+  border: 1px solid var(--cp-border);
+  border-radius: var(--cp-radius);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+/* Scenarios section */
+.custom-pwa-scenarios-section {
+  background: var(--cp-bg);
+  border: 1px solid var(--cp-border);
+  border-radius: var(--cp-radius);
+  padding: 20px;
+}
+
+/* Scenario accordion container */
+.custom-pwa-scenarios-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Individual scenario panel */
+.custom-pwa-scenario-panel {
+  background: #f9fafb;
+  border: 1px solid var(--cp-border);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.custom-pwa-scenario-panel:hover {
+  border-color: var(--cp-accent-light);
+  box-shadow: 0 2px 8px rgba(111, 56, 199, 0.05);
+}
+
+/* Scenario header (clickable) */
+.custom-pwa-scenario-header {
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  user-select: none;
+}
+
+.custom-pwa-scenario-header:hover {
+  background: #f3f4f6;
+}
+
+/* Scenario title row */
+.custom-pwa-scenario-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: #1e293b;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+/* Scenario expand/collapse icon */
+.custom-pwa-scenario-icon {
+  color: var(--cp-accent);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.custom-pwa-scenario-panel.expanded .custom-pwa-scenario-icon {
+  transform: rotate(90deg);
+}
+
+/* Scenario status badge */
+.custom-pwa-scenario-status {
+  margin-left: auto;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.custom-pwa-scenario-status.enabled {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.custom-pwa-scenario-status.disabled {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* Scenario description */
+.custom-pwa-scenario-description {
+  margin: 0;
+  font-size: 13px;
+  color: var(--cp-muted);
+  line-height: 1.5;
+}
+
+/* Scenario body (expandable content) */
+.custom-pwa-scenario-body {
+  border-top: 1px solid var(--cp-border);
+  background: var(--cp-bg);
+  padding: 0 18px 18px;
+  display: none; /* Hidden by default */
+}
+
+.custom-pwa-scenario-body .form-table {
+  margin-top: 12px;
+}
+
+.custom-pwa-scenario-body .form-table th {
+  font-weight: 500;
+  color: #374151;
+  padding: 12px 0;
+  width: 180px;
+}
+
+.custom-pwa-scenario-body .form-table td {
+  padding: 12px 0;
+}
+
+.custom-pwa-scenario-body input[type="text"],
+.custom-pwa-scenario-body input[type="number"],
+.custom-pwa-scenario-body textarea {
+  border: 1px solid var(--cp-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.custom-pwa-scenario-body input[type="text"]:focus,
+.custom-pwa-scenario-body input[type="number"]:focus,
+.custom-pwa-scenario-body textarea:focus {
+  border-color: var(--cp-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(111, 56, 199, 0.1);
+}
+
+.custom-pwa-scenario-body input[type="checkbox"] {
+  accent-color: var(--cp-accent);
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+/* Add JavaScript to toggle accordion */
+.custom-pwa-scenario-header[data-toggle] {
+  position: relative;
+}
+
+/* Table styling in Config page with roles */
+.custom-pwa-config-section table.widefat {
+  border-collapse: collapse;
+  border: 1px solid var(--cp-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.custom-pwa-config-section table.widefat thead th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid var(--cp-border);
+}
+
+.custom-pwa-config-section table.widefat tbody tr {
+  transition: background 0.2s ease;
+}
+
+.custom-pwa-config-section table.widefat tbody tr:hover {
+  background: #f9fafb;
+}
+
+.custom-pwa-config-section table.widefat tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+.custom-pwa-config-section table.widefat tbody tr:nth-child(even):hover {
+  background: #f3f4f6;
+}
+
+.custom-pwa-config-section table.widefat td,
+.custom-pwa-config-section table.widefat th {
+  border-bottom: 1px solid var(--cp-border);
+}
+
+.custom-pwa-config-section select {
+  border: 1px solid var(--cp-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 14px;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.custom-pwa-config-section select:focus {
+  border-color: var(--cp-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(111, 56, 199, 0.1);
+}
+
+/* Inline JavaScript handler for accordion toggle */

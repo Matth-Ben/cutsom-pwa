@@ -150,23 +150,25 @@ class Custom_PWA_Settings {
 	 */
 	public function render_settings_page() {
 		?>
-		<form method="post" action="options.php">
-			<?php
-			settings_fields( 'custom_pwa_settings_group' );
-			do_settings_sections( 'custom_pwa_settings' );
-			submit_button();
-			?>
-		</form>
+		<div class="custom-pwa-card">
+			<form method="post" action="options.php">
+				<?php
+				settings_fields( 'custom_pwa_settings_group' );
+				do_settings_sections( 'custom_pwa_settings' );
+				submit_button( null, 'cp-btn primary' );
+				?>
+			</form>
+		</div>
 
-		<hr />
-
-		<h2><?php esc_html_e( 'Manifest Preview', 'custom-pwa' ); ?></h2>
-		<p>
-			<?php esc_html_e( 'Manifest URL:', 'custom-pwa' ); ?> 
-			<a href="<?php echo esc_url( home_url( '/manifest.webmanifest' ) ); ?>" target="_blank">
-				<?php echo esc_html( home_url( '/manifest.webmanifest' ) ); ?>
-			</a>
-		</p>
+		<div class="custom-pwa-card" style="margin-top:20px;">
+			<h2><?php esc_html_e( 'Manifest Preview', 'custom-pwa' ); ?></h2>
+			<p>
+				<?php esc_html_e( 'Manifest URL:', 'custom-pwa' ); ?> 
+				<a href="<?php echo esc_url( home_url( '/manifest.webmanifest' ) ); ?>" target="_blank">
+					<?php echo esc_html( home_url( '/manifest.webmanifest' ) ); ?>
+				</a>
+			</p>
+		</div>
 		<?php
 	}
 

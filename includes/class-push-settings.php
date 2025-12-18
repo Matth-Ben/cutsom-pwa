@@ -2,15 +2,17 @@
 /**
  * Push Settings Class
  * 
- * Handles Web Push notification configuration:
- * - Enable/disable push per post type
- * - Notification templates (title, body, URL)
+ * Handles Web Push notification configuration with scenario-based system:
+ * - Two-column layout (sidebar + main panel)
+ * - Per-post-type configuration sections
+ * - Multiple notification scenarios per role
+ * - Extensible scenario definitions
  * - Template placeholders
  * - Test notification tool
- * - Optional log viewer
  *
  * @package Custom_PWA
  * @since 1.0.0
+ * @updated 1.1.0 - Added scenario-based system
  */
 
 // Exit if accessed directly.
@@ -73,20 +75,84 @@ class Custom_PWA_Push_Settings {
 	 * Render the settings page.
 	 */
 	public function render_settings_page() {
+		// Get enabled post types from config.
+		$config = get_option( 'custom_pwa_config', array() );
+		$enabled_post_types = isset( $config['enabled_post_types'] ) ? $config['enabled_post_types'] : array();
+
+		if ( empty( $enabled_post_types ) ) {
+			echo '<div style="padding:40px; text-align:center; color:var(--cp-muted);">';
+			echo '<p style="font-size:15px;">' . esc_html__( 'No post types are enabled for Web Push.', 'custom-pwa' ) . '</p>';
+			echo '<p><a href="' . esc_url( admin_url( 'admin.php?page=custom-pwa-config' ) ) . '" class="button cp-btn">' . esc_html__( 'Configure Post Types', 'custom-pwa' ) . '</a></p>';
+			echo '</div>';
+			return;
+		}
+
 		?>
-		<form method="post" action="options.php">
-			<?php
-			settings_fields( 'custom_pwa_push_group' );
-			do_settings_sections( 'custom_pwa_push' );
+		<form method="post" action="options.php" id="custom-pwa-push-form">
+			<?php settings_fields( 'custom_pwa_push_group' ); ?>
 			
-			// Render post type rules.
-			$this->render_post_type_rules();
-			
-			submit_button();
-			?>
+			<!-- Render ALL enabled post types (they will be shown/hidden by JavaScript) -->
+			<div class="custom-pwa-push-content">
+				<?php 
+				foreach ( $enabled_post_types as $post_type ) {
+					try {
+						$this->render_post_type_config( $post_type );
+					} catch ( Exception $e ) {
+						echo '<div class="notice notice-error"><p>';
+						echo sprintf( 
+							/* translators: %1$s: post type, %2$s: error message */
+							esc_html__( 'Error rendering %1$s: %2$s', 'custom-pwa' ),
+							esc_html( $post_type ),
+							esc_html( $e->getMessage() )
+						);
+						echo '</p></div>';
+					}
+				}
+				?>
+			</div>
 		</form>
 
-		<?php $this->render_test_tool(); ?>
+		<?php 
+		$this->render_test_tool(); 
+		$this->render_accordion_script();
+		?>
+		<?php
+	}
+
+	/**
+	 * Render JavaScript for accordion functionality.
+	 */
+	private function render_accordion_script() {
+		?>
+		<script type="text/javascript">
+		jQuery(document).ready(function($) {
+			// Handle accordion toggle
+			$('.custom-pwa-scenario-header').on('click', function() {
+				var panel = $(this).closest('.custom-pwa-scenario-panel');
+				var body = panel.find('.custom-pwa-scenario-body');
+				
+				// Toggle expanded class
+				panel.toggleClass('expanded');
+				
+				// Slide toggle the body
+				body.slideToggle(250);
+			});
+			
+			// Update status badge when enable checkbox is toggled
+			$('.custom-pwa-scenario-enable').on('change', function() {
+				var panel = $(this).closest('.custom-pwa-scenario-panel');
+				var statusBadge = panel.find('.custom-pwa-scenario-status');
+				
+				if ($(this).is(':checked')) {
+					statusBadge.removeClass('disabled').addClass('enabled');
+					statusBadge.text('<?php echo esc_js( __( 'Enabled', 'custom-pwa' ) ); ?>');
+				} else {
+					statusBadge.removeClass('enabled').addClass('disabled');
+					statusBadge.text('<?php echo esc_js( __( 'Disabled', 'custom-pwa' ) ); ?>');
+				}
+			});
+		});
+		</script>
 		<?php
 	}
 
@@ -106,92 +172,330 @@ class Custom_PWA_Push_Settings {
 	}
 
 	/**
-	 * Render post type rules.
+	 * Render configuration for a specific post type.
+	 * 
+	 * Shows:
+	 * - General config section (enable/disable, thresholds, etc.)
+	 * - List of scenarios based on assigned role
+	 * - Each scenario in an accordion panel with fields
+	 *
+	 * @param string $post_type Post type name.
 	 */
-	private function render_post_type_rules() {
-		$config = get_option( 'custom_pwa_config', array() );
-		$enabled_post_types = isset( $config['enabled_post_types'] ) ? $config['enabled_post_types'] : array();
+	private function render_post_type_config( $post_type ) {
+		require_once plugin_dir_path( __FILE__ ) . 'class-push-rules.php';
+		require_once plugin_dir_path( __FILE__ ) . 'class-push-scenarios.php';
+		require_once plugin_dir_path( __FILE__ ) . 'class-custom-scenarios.php';
 
-		if ( empty( $enabled_post_types ) ) {
-			echo '<p>' . esc_html__( 'No post types are enabled for Web Push. Please configure them in the Config page.', 'custom-pwa' ) . '</p>';
+		// Get post type object.
+		$post_type_object = get_post_type_object( $post_type );
+		if ( ! $post_type_object ) {
 			return;
 		}
 
-		$rules = get_option( $this->option_name, array() );
+		// Get role for this post type.
+		$role = Custom_PWA_Push_Rules::get_post_type_role( $post_type );
+		$role_label = Custom_PWA_Push_Scenarios::get_roles()[ $role ] ?? __( 'Generic', 'custom-pwa' );
 
-		echo '<table class="form-table" role="presentation">';
-		
-		foreach ( $enabled_post_types as $post_type ) {
-			$post_type_object = get_post_type_object( $post_type );
-			if ( ! $post_type_object ) {
-				continue;
-			}
+		// Get rules for this post type.
+		$rules = Custom_PWA_Push_Rules::get_post_type_rules( $post_type );
+		$config = $rules['config'];
+		$scenarios = $rules['scenarios'];
 
-			$rule = isset( $rules[ $post_type ] ) ? $rules[ $post_type ] : $this->get_default_rule( $post_type );
+		// Get COMBINED scenario definitions (built-in + custom) for this role and post type.
+		$scenario_definitions = Custom_PWA_Push_Scenarios::get_combined_scenarios_for_post_type( $post_type, $role );
 
-			echo '<tr>';
-			echo '<th scope="row" colspan="2">';
-			echo '<h3>' . esc_html( $post_type_object->labels->name ) . ' <small>(' . esc_html( $post_type ) . ')</small></h3>';
-			echo '</th>';
-			echo '</tr>';
+		?>
+		<div class="custom-pwa-cpt-card custom-pwa-push-main" data-cpt="<?php echo esc_attr( $post_type ); ?>">
+			<!-- Header -->
+			<div style="margin-bottom:24px;">
+				<h2 style="margin:0 0 8px 0; font-size:20px; color:#0f172a;">
+					<?php echo esc_html( $post_type_object->labels->name ); ?>
+					<span class="custom-pwa-badge" style="margin-left:8px; background:#f1f5f9; color:#475569; padding:4px 10px; border-radius:6px; font-size:13px; font-weight:500;">
+						<?php echo esc_html( $post_type ); ?>
+					</span>
+					<span class="custom-pwa-badge" style="margin-left:8px; background:var(--cp-accent-light); color:var(--cp-accent); padding:4px 10px; border-radius:6px; font-size:13px; font-weight:500;">
+						<?php echo esc_html( $role_label ); ?>
+					</span>
+				</h2>
+				<p style="margin:0; color:#64748b; font-size:14px;">
+					<?php esc_html_e( 'Configure push notification scenarios and templates for this post type.', 'custom-pwa' ); ?>
+				</p>
+			</div>
 
-			// Enable checkbox.
-			echo '<tr>';
-			echo '<th scope="row">' . esc_html__( 'Enable Notifications', 'custom-pwa' ) . '</th>';
-			echo '<td>';
-			echo '<label>';
-			echo '<input type="checkbox" name="' . esc_attr( $this->option_name ) . '[' . esc_attr( $post_type ) . '][enabled]" value="1" ' . checked( ! empty( $rule['enabled'] ), true, false ) . ' />';
-			echo ' ' . esc_html__( 'Send push notifications when this post type is published', 'custom-pwa' );
-			echo '</label>';
-			echo '</td>';
-			echo '</tr>';
+			<!-- General Config Section -->
+			<div class="custom-pwa-config-section" style="margin-bottom:32px;">
+				<h3 style="margin:0 0 16px 0; font-size:16px; color:#1e293b; padding-bottom:12px; border-bottom:2px solid var(--cp-accent-light);">
+					<?php esc_html_e( 'General Configuration', 'custom-pwa' ); ?>
+				</h3>
+				
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Enable Notifications', 'custom-pwa' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" 
+									name="<?php echo esc_attr( $this->option_name ); ?>[<?php echo esc_attr( $post_type ); ?>][config][enabled]" 
+									value="1" 
+									<?php checked( ! empty( $config['enabled'] ) ); ?> 
+								/>
+								<?php esc_html_e( 'Enable push notifications for this post type', 'custom-pwa' ); ?>
+							</label>
+							<p class="description">
+								<?php esc_html_e( 'Master switch: when disabled, no notifications will be sent regardless of scenario settings.', 'custom-pwa' ); ?>
+							</p>
+						</td>
+					</tr>
+				</table>
+			</div>
 
-			// Title template.
-			echo '<tr>';
-			echo '<th scope="row">' . esc_html__( 'Title Template', 'custom-pwa' ) . '</th>';
-			echo '<td>';
-			echo '<input type="text" name="' . esc_attr( $this->option_name ) . '[' . esc_attr( $post_type ) . '][title]" value="' . esc_attr( $rule['title'] ) . '" class="large-text" />';
-			echo '</td>';
-			echo '</tr>';
+			<!-- Scenarios Section -->
+			<div class="custom-pwa-scenarios-section">
+				<h3 style="margin:0 0 16px 0; font-size:16px; color:#1e293b; padding-bottom:12px; border-bottom:2px solid var(--cp-accent-light);">
+					<?php esc_html_e( 'Notification Scenarios', 'custom-pwa' ); ?>
+				</h3>
+				<p style="margin:0 0 16px 0; color:#64748b; font-size:14px;">
+					<?php esc_html_e( 'Configure different notification scenarios for various post events and triggers.', 'custom-pwa' ); ?>
+				</p>
 
-			// Body template.
-			echo '<tr>';
-			echo '<th scope="row">' . esc_html__( 'Body Template', 'custom-pwa' ) . '</th>';
-			echo '<td>';
-			echo '<textarea name="' . esc_attr( $this->option_name ) . '[' . esc_attr( $post_type ) . '][body]" rows="3" class="large-text">' . esc_textarea( $rule['body'] ) . '</textarea>';
-			echo '</td>';
-			echo '</tr>';
+				<?php if ( empty( $scenario_definitions ) ) : ?>
+					<p style="color:#dc2626;">
+						<?php 
+						echo esc_html( 
+							sprintf( 
+								/* translators: %s: role label */
+								__( 'No scenarios found for role "%s". Please check your configuration.', 'custom-pwa' ), 
+								$role_label 
+							) 
+						); 
+						?>
+					</p>
+				<?php else : ?>
+					<div class="custom-pwa-scenarios-accordion">
+						<?php 
+						foreach ( $scenario_definitions as $scenario_key => $scenario_def ) {
+							$this->render_scenario_panel( $post_type, $scenario_key, $scenario_def, $scenarios[ $scenario_key ] ?? array() );
+						}
+						?>
+					</div>
+				<?php endif; ?>
+			</div>
 
-			// URL template.
-			echo '<tr>';
-			echo '<th scope="row">' . esc_html__( 'URL Template', 'custom-pwa' ) . '</th>';
-			echo '<td>';
-			echo '<input type="text" name="' . esc_attr( $this->option_name ) . '[' . esc_attr( $post_type ) . '][url]" value="' . esc_attr( $rule['url'] ) . '" class="large-text" />';
-			echo '</td>';
-			echo '</tr>';
-
-			echo '<tr><td colspan="2"><hr /></td></tr>';
-		}
-
-		echo '</table>';
+			<!-- Submit Button -->
+			<div style="padding-top:24px; border-top:1px solid var(--cp-border); margin-top:32px;">
+				<?php submit_button( __( 'Save Changes', 'custom-pwa' ), 'cp-btn primary', 'submit', false ); ?>
+				<span class="spinner" style="float:none; margin:0 0 0 12px;"></span>
+			</div>
+		</div>
+		<?php
 	}
 
 	/**
-	 * Get default rule for a post type.
+	 * Render a single scenario panel (accordion item).
 	 *
-	 * @param string $post_type Post type name.
-	 * @return array Default rule.
+	 * @param string $post_type    Post type name.
+	 * @param string $scenario_key Scenario key.
+	 * @param array  $scenario_def Scenario definition from configuration.
+	 * @param array  $saved_data   Saved scenario data (or defaults).
 	 */
-	private function get_default_rule( $post_type ) {
-		$post_type_object = get_post_type_object( $post_type );
-		$label = $post_type_object ? $post_type_object->labels->singular_name : ucfirst( $post_type );
+	private function render_scenario_panel( $post_type, $scenario_key, $scenario_def, $saved_data ) {
+		$enabled = ! empty( $saved_data['enabled'] );
+		$title_template = isset( $saved_data['title_template'] ) ? $saved_data['title_template'] : $scenario_def['default_title'];
+		$body_template = isset( $saved_data['body_template'] ) ? $saved_data['body_template'] : $scenario_def['default_body'];
+		$url_template = isset( $saved_data['url_template'] ) ? $saved_data['url_template'] : $scenario_def['default_url'];
+		
+		// Check if this is a custom scenario
+		$is_custom = isset( $scenario_def['is_custom'] ) && $scenario_def['is_custom'];
 
-		return array(
-			'enabled' => false,
-			'title'   => sprintf( __( 'New %s: {post_title}', 'custom-pwa' ), $label ),
-			'body'    => '{excerpt}',
-			'url'     => '{permalink}',
-		);
+		$panel_id = 'scenario-' . $post_type . '-' . $scenario_key;
+		?>
+		<div class="custom-pwa-scenario-panel" data-scenario="<?php echo esc_attr( $scenario_key ); ?>">
+			<div class="custom-pwa-scenario-header" data-toggle="<?php echo esc_attr( $panel_id ); ?>">
+				<div class="custom-pwa-scenario-title">
+					<span class="dashicons dashicons-arrow-right custom-pwa-scenario-icon"></span>
+					<strong><?php echo esc_html( $scenario_def['label'] ); ?></strong>
+					<?php if ( $is_custom ) : ?>
+						<span class="custom-pwa-badge" style="background:#ddd6fe; color:var(--cp-accent); margin-left:8px;">
+							<?php esc_html_e( 'Custom', 'custom-pwa' ); ?>
+						</span>
+					<?php endif; ?>
+					<span class="custom-pwa-scenario-status <?php echo $enabled ? 'enabled' : 'disabled'; ?>">
+						<?php echo $enabled ? esc_html__( 'Enabled', 'custom-pwa' ) : esc_html__( 'Disabled', 'custom-pwa' ); ?>
+					</span>
+				</div>
+				<p class="custom-pwa-scenario-description">
+					<?php echo esc_html( $scenario_def['description'] ); ?>
+				</p>
+			</div>
+
+			<div class="custom-pwa-scenario-body" id="<?php echo esc_attr( $panel_id ); ?>" style="display:none;">
+				<table class="form-table" role="presentation">
+					<!-- Enable Checkbox -->
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Enable Scenario', 'custom-pwa' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" 
+									name="<?php echo esc_attr( $this->option_name ); ?>[<?php echo esc_attr( $post_type ); ?>][scenarios][<?php echo esc_attr( $scenario_key ); ?>][enabled]" 
+									value="1" 
+									<?php checked( $enabled ); ?>
+									class="custom-pwa-scenario-enable" 
+								/>
+								<?php 
+								echo esc_html( 
+									sprintf( 
+										/* translators: %s: scenario label */
+										__( 'Enable "%s" notifications', 'custom-pwa' ), 
+										$scenario_def['label'] 
+									) 
+								); 
+								?>
+							</label>
+						</td>
+					</tr>
+
+					<!-- Title Template -->
+					<tr>
+						<th scope="row">
+							<label for="<?php echo esc_attr( $panel_id ); ?>-title">
+								<?php esc_html_e( 'Title Template', 'custom-pwa' ); ?>
+							</label>
+						</th>
+						<td>
+							<input type="text" 
+								id="<?php echo esc_attr( $panel_id ); ?>-title" 
+								name="<?php echo esc_attr( $this->option_name ); ?>[<?php echo esc_attr( $post_type ); ?>][scenarios][<?php echo esc_attr( $scenario_key ); ?>][title_template]" 
+								value="<?php echo esc_attr( $title_template ); ?>" 
+								class="large-text" 
+							/>
+							<p class="description">
+								<?php $this->render_placeholder_hints(); ?>
+							</p>
+						</td>
+					</tr>
+
+					<!-- Body Template -->
+					<tr>
+						<th scope="row">
+							<label for="<?php echo esc_attr( $panel_id ); ?>-body">
+								<?php esc_html_e( 'Body Template', 'custom-pwa' ); ?>
+							</label>
+						</th>
+						<td>
+							<textarea 
+								id="<?php echo esc_attr( $panel_id ); ?>-body" 
+								name="<?php echo esc_attr( $this->option_name ); ?>[<?php echo esc_attr( $post_type ); ?>][scenarios][<?php echo esc_attr( $scenario_key ); ?>][body_template]" 
+								rows="3" 
+								class="large-text"
+							><?php echo esc_textarea( $body_template ); ?></textarea>
+							<p class="description">
+								<?php $this->render_placeholder_hints(); ?>
+							</p>
+						</td>
+					</tr>
+
+					<!-- URL Template -->
+					<tr>
+						<th scope="row">
+							<label for="<?php echo esc_attr( $panel_id ); ?>-url">
+								<?php esc_html_e( 'URL Template', 'custom-pwa' ); ?>
+							</label>
+						</th>
+						<td>
+							<input type="text" 
+								id="<?php echo esc_attr( $panel_id ); ?>-url" 
+								name="<?php echo esc_attr( $this->option_name ); ?>[<?php echo esc_attr( $post_type ); ?>][scenarios][<?php echo esc_attr( $scenario_key ); ?>][url_template]" 
+								value="<?php echo esc_attr( $url_template ); ?>" 
+								class="large-text" 
+							/>
+							<p class="description">
+								<?php esc_html_e( 'Available: {permalink}', 'custom-pwa' ); ?>
+							</p>
+						</td>
+					</tr>
+
+					<?php
+					// Render extra fields defined in scenario configuration.
+					if ( ! empty( $scenario_def['fields'] ) ) {
+						foreach ( $scenario_def['fields'] as $field_key => $field_config ) {
+							$this->render_scenario_field( $post_type, $scenario_key, $field_key, $field_config, $saved_data );
+						}
+					}
+					?>
+				</table>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render an extra scenario field (threshold, meta_key, etc.).
+	 *
+	 * @param string $post_type    Post type name.
+	 * @param string $scenario_key Scenario key.
+	 * @param string $field_key    Field key.
+	 * @param array  $field_config Field configuration.
+	 * @param array  $saved_data   Saved scenario data.
+	 */
+	private function render_scenario_field( $post_type, $scenario_key, $field_key, $field_config, $saved_data ) {
+		$field_value = isset( $saved_data[ $field_key ] ) ? $saved_data[ $field_key ] : ( $field_config['default'] ?? '' );
+		$field_id = 'scenario-' . $post_type . '-' . $scenario_key . '-' . $field_key;
+		$field_name = $this->option_name . '[' . $post_type . '][scenarios][' . $scenario_key . '][' . $field_key . ']';
+
+		?>
+		<tr>
+			<th scope="row">
+				<label for="<?php echo esc_attr( $field_id ); ?>">
+					<?php echo esc_html( $field_config['label'] ); ?>
+				</label>
+			</th>
+			<td>
+				<?php
+				switch ( $field_config['type'] ) {
+					case 'number':
+						?>
+						<input type="number" 
+							id="<?php echo esc_attr( $field_id ); ?>" 
+							name="<?php echo esc_attr( $field_name ); ?>" 
+							value="<?php echo esc_attr( $field_value ); ?>" 
+							class="small-text" 
+							min="0"
+						/>
+						<?php
+						break;
+
+					case 'text':
+					default:
+						?>
+						<input type="text" 
+							id="<?php echo esc_attr( $field_id ); ?>" 
+							name="<?php echo esc_attr( $field_name ); ?>" 
+							value="<?php echo esc_attr( $field_value ); ?>" 
+							class="regular-text" 
+						/>
+						<?php
+						break;
+				}
+
+				if ( ! empty( $field_config['description'] ) ) {
+					echo '<p class="description">' . esc_html( $field_config['description'] ) . '</p>';
+				}
+				?>
+			</td>
+		</tr>
+		<?php
+	}
+
+	/**
+	 * Render placeholder hints for templates.
+	 */
+	private function render_placeholder_hints() {
+		$placeholders = Custom_PWA_Push_Scenarios::get_placeholders();
+		$common = $placeholders['common']['placeholders'] ?? array();
+		
+		$hint_text = __( 'Available: ', 'custom-pwa' );
+		$hint_text .= implode( ', ', array_keys( $common ) );
+		
+		echo esc_html( $hint_text );
 	}
 
 	/**
@@ -199,43 +503,46 @@ class Custom_PWA_Push_Settings {
 	 */
 	private function render_test_tool() {
 		?>
-		<hr />
-		<h2><?php esc_html_e( 'Send Test Notification', 'custom-pwa' ); ?></h2>
-		<p><?php esc_html_e( 'Send a test push notification to all subscribed devices.', 'custom-pwa' ); ?></p>
-		
-		<table class="form-table">
-			<tr>
-				<th scope="row">
-					<label for="test_title"><?php esc_html_e( 'Title', 'custom-pwa' ); ?></label>
-				</th>
-				<td>
-					<input type="text" id="test_title" class="regular-text" value="<?php esc_attr_e( 'Test Notification', 'custom-pwa' ); ?>" />
-				</td>
-			</tr>
-			<tr>
-				<th scope="row">
-					<label for="test_body"><?php esc_html_e( 'Body', 'custom-pwa' ); ?></label>
-				</th>
-				<td>
-					<textarea id="test_body" rows="3" class="large-text"><?php esc_html_e( 'This is a test push notification from Custom PWA plugin.', 'custom-pwa' ); ?></textarea>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row">
-					<label for="test_url"><?php esc_html_e( 'URL', 'custom-pwa' ); ?></label>
-				</th>
-				<td>
-					<input type="text" id="test_url" class="regular-text" value="<?php echo esc_attr( home_url( '/' ) ); ?>" />
-				</td>
-			</tr>
-		</table>
+		<div class="custom-pwa-cpt-card" id="test-notification-card" style="display:none;">
+			<h3 style="margin:0 0 16px 0; font-size:18px; color:#0f172a; padding-bottom:12px; border-bottom:2px solid var(--cp-accent-light);">
+				<?php esc_html_e( 'Test Notification', 'custom-pwa' ); ?>
+			</h3>
+			<p><?php esc_html_e( 'Send a test push notification to all subscribed devices.', 'custom-pwa' ); ?></p>
+			
+			<table class="form-table">
+				<tr>
+					<th scope="row">
+						<label for="test_title"><?php esc_html_e( 'Title', 'custom-pwa' ); ?></label>
+					</th>
+					<td>
+						<input type="text" id="test_title" class="regular-text" value="<?php esc_attr_e( 'Test Notification', 'custom-pwa' ); ?>" />
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="test_body"><?php esc_html_e( 'Body', 'custom-pwa' ); ?></label>
+					</th>
+					<td>
+						<textarea id="test_body" rows="3" class="large-text"><?php esc_html_e( 'This is a test push notification from Custom PWA plugin.', 'custom-pwa' ); ?></textarea>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="test_url"><?php esc_html_e( 'URL', 'custom-pwa' ); ?></label>
+					</th>
+					<td>
+						<input type="text" id="test_url" class="regular-text" value="<?php echo esc_attr( home_url( '/' ) ); ?>" />
+					</td>
+				</tr>
+			</table>
 
-		<p>
-			<button type="button" id="custom_pwa_send_test" class="button button-primary">
-				<?php esc_html_e( 'Send Test Notification', 'custom-pwa' ); ?>
-			</button>
-			<span id="custom_pwa_test_result" style="margin-left: 10px;"></span>
-		</p>
+			<p>
+				<button type="button" id="custom_pwa_send_test" class="button cp-btn">
+					<?php esc_html_e( 'Send Test Notification', 'custom-pwa' ); ?>
+				</button>
+				<span id="custom_pwa_test_result" style="margin-left: 10px;"></span>
+			</p>
+		</div>
 
 		<script type="text/javascript">
 		jQuery(document).ready(function($) {
@@ -280,36 +587,8 @@ class Custom_PWA_Push_Settings {
 	 * @return array Sanitized values.
 	 */
 	public function sanitize_push_rules( $input ) {
-		$sanitized = array();
-
-		if ( ! is_array( $input ) ) {
-			return $sanitized;
-		}
-
-		foreach ( $input as $post_type => $rule ) {
-			$post_type = sanitize_key( $post_type );
-			
-			if ( ! post_type_exists( $post_type ) ) {
-				continue;
-			}
-
-			$sanitized[ $post_type ] = array(
-				'enabled' => ! empty( $rule['enabled'] ),
-				'title'   => isset( $rule['title'] ) ? sanitize_text_field( $rule['title'] ) : '',
-				'body'    => isset( $rule['body'] ) ? sanitize_textarea_field( $rule['body'] ) : '',
-				'url'     => isset( $rule['url'] ) ? sanitize_text_field( $rule['url'] ) : '',
-			);
-		}
-
-		/**
-		 * Filter push rules before saving.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param array $sanitized Sanitized rules.
-		 * @param array $input     Raw input.
-		 */
-		return apply_filters( 'custom_pwa_push_rules', $sanitized, $input );
+		require_once plugin_dir_path( __FILE__ ) . 'class-push-rules.php';
+		return Custom_PWA_Push_Rules::sanitize_rules( $input );
 	}
 
 	/**

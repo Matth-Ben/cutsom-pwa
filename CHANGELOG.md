@@ -2,6 +2,62 @@
 
 All notable changes to the Custom PWA plugin will be documented in this file.
 
+## [1.0.4] - 2025-12-18
+
+### Added
+- **Custom Scenarios Management**: User-defined push notification scenarios
+  - New "Manage Scenarios" tab in Custom PWA → Push admin page
+  - Full CRUD interface for creating, editing, and deleting scenarios
+  - Scope selection: Global (all post types) or specific post types
+  - Trigger configuration: publication, major_update, status_change
+  - Template fields: title, body, URL with placeholders support
+  - Dynamic field management with Add/Remove buttons
+  - Built-in scenarios (publication, major_update, status_change) remain available
+  - Custom scenarios merge with built-in scenarios per post type
+  - Storage in `custom_pwa_custom_scenarios` WordPress option
+- **Tabbed Interface**: Push page now organized with tabs
+  - "Post Type Configuration" tab: Configure notifications per post type
+  - "Manage Scenarios" tab: Create and manage custom scenarios
+  - Clean navigation between configuration and scenario management
+- **Automatic Data Migration**: Old format to scenario-based format
+  - Detects old data structure (pre-scenarios format)
+  - Automatically converts to new format on first load
+  - Preserves custom templates from old format in first scenario
+  - Prevents "Impossible de charger" errors on upgrade
+
+### Fixed
+- **Page Load Error**: Fixed "Impossible de charger custom-pwa-push" fatal error
+  - Changed URL parameter from `post_type=` to `cpt=` to avoid WordPress conflicts
+  - WordPress reserves `post_type` parameter for its core post type management
+  - Using custom `cpt` parameter prevents interference with WordPress admin system
+  - Page now loads correctly when navigating between post types
+- **Sidebar Navigation**: Fixed multiple active states in sidebar
+  - Removed duplicate `active` class application
+  - Ensures only one sidebar item is active at a time
+  - Properly highlights selected post type on page reload
+- **Accordion Toggle Bug**: Fixed double-click requirement for accordion
+  - Removed duplicate jQuery event handlers
+  - Accordion now opens/closes with single click
+- **JavaScript Timing**: Fixed sidebar navigation not working
+  - Moved JavaScript execution after HTML rendering
+  - Sidebar items now properly respond to clicks
+- **Post Type Rendering**: Fixed "Pages" not displaying content
+  - Changed to render ALL enabled post types in loop
+  - JavaScript now shows/hides appropriate content
+  - All post types accessible via sidebar navigation
+- **Missing Dependencies**: Added required `class-custom-scenarios.php` include
+  - Added to `render_push_page()` method in class-admin-menu.php
+  - Prevents class not found errors during migration
+
+### Changed
+- **Data Structure**: Enhanced rules structure to support scenarios
+  - Old format: `array('post' => array('enabled', 'title', 'body', 'url'))`
+  - New format: `array('post' => array('config' => array(...), 'scenarios' => array(...)))`
+  - Backward compatible through automatic migration
+- **URL Parameters**: Changed from `post_type=` to `cpt=` in admin URLs
+  - Avoids conflicts with WordPress core parameter names
+  - Example: `?page=custom-pwa-push&tab=post-types&cpt=post`
+
 ## [1.0.3] - 2025-12-18
 
 ### Added

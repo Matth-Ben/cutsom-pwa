@@ -128,13 +128,15 @@ class Custom_PWA_Config_Settings {
 	 */
 	public function render_settings_page() {
 		?>
-		<form method="post" action="options.php">
-			<?php
-			settings_fields( 'custom_pwa_config_group' );
-			do_settings_sections( 'custom_pwa_config' );
-			submit_button();
-			?>
-		</form>
+		<div class="custom-pwa-card">
+			<form method="post" action="options.php">
+				<?php
+				settings_fields( 'custom_pwa_config_group' );
+				do_settings_sections( 'custom_pwa_config' );
+				submit_button( null, 'cp-btn primary' );
+				?>
+			</form>
+		</div>
 		<?php
 	}
 
@@ -215,6 +217,7 @@ class Custom_PWA_Config_Settings {
 	public function render_enabled_post_types_field() {
 		$options       = get_option( $this->option_name, array() );
 		$enabled_types = isset( $options['enabled_post_types'] ) ? $options['enabled_post_types'] : array( 'post' );
+		$post_type_roles = isset( $options['post_type_roles'] ) ? $options['post_type_roles'] : array();
 
 		// Get all public post types.
 		$post_types = get_post_types( array( 'public' => true ), 'objects' );
@@ -228,22 +231,46 @@ class Custom_PWA_Config_Settings {
 			return;
 		}
 
+		// Get available roles from scenarios.
+		require_once plugin_dir_path( __FILE__ ) . 'class-push-scenarios.php';
+		$available_roles = Custom_PWA_Push_Scenarios::get_roles();
+
 		echo '<fieldset>';
+		echo '<p class="description" style="margin-top:0;">' . esc_html__( 'Select post types and assign roles to customize push notification scenarios.', 'custom-pwa' ) . '</p>';
+		echo '<table class="widefat" style="margin-top:12px; max-width:800px;">';
+		echo '<thead>';
+		echo '<tr>';
+		echo '<th style="width:40px; padding:8px; text-align:center;">' . esc_html__( 'Enable', 'custom-pwa' ) . '</th>';
+		echo '<th style="padding:8px;">' . esc_html__( 'Post Type', 'custom-pwa' ) . '</th>';
+		echo '<th style="padding:8px;">' . esc_html__( 'Role', 'custom-pwa' ) . '</th>';
+		echo '</tr>';
+		echo '</thead>';
+		echo '<tbody>';
+		
 		foreach ( $post_types as $post_type ) {
 			$checked = in_array( $post_type->name, $enabled_types, true ) ? 'checked' : '';
-			?>
-			<label style="display: block; margin-bottom: 8px;">
-				<input 
-					type="checkbox" 
-					name="<?php echo esc_attr( $this->option_name ); ?>[enabled_post_types][]" 
-					value="<?php echo esc_attr( $post_type->name ); ?>" 
-					<?php echo esc_attr( $checked ); ?>
-				/>
-				<?php echo esc_html( $post_type->labels->name ); ?> 
-				<small>(<?php echo esc_html( $post_type->name ); ?>)</small>
-			</label>
-			<?php
+			$selected_role = isset( $post_type_roles[ $post_type->name ] ) ? $post_type_roles[ $post_type->name ] : 'generic';
+			
+			echo '<tr>';
+			echo '<td style="text-align:center; padding:8px;">';
+			echo '<input type="checkbox" name="' . esc_attr( $this->option_name ) . '[enabled_post_types][]" value="' . esc_attr( $post_type->name ) . '" ' . esc_attr( $checked ) . ' />';
+			echo '</td>';
+			echo '<td style="padding:8px;">';
+			echo '<strong>' . esc_html( $post_type->labels->name ) . '</strong> ';
+			echo '<small style="color:#666;">(' . esc_html( $post_type->name ) . ')</small>';
+			echo '</td>';
+			echo '<td style="padding:8px;">';
+			echo '<select name="' . esc_attr( $this->option_name ) . '[post_type_roles][' . esc_attr( $post_type->name ) . ']" style="width:auto;">';
+			foreach ( $available_roles as $role_key => $role_label ) {
+				echo '<option value="' . esc_attr( $role_key ) . '" ' . selected( $selected_role, $role_key, false ) . '>' . esc_html( $role_label ) . '</option>';
+			}
+			echo '</select>';
+			echo '</td>';
+			echo '</tr>';
 		}
+		
+		echo '</tbody>';
+		echo '</table>';
 		echo '</fieldset>';
 		?>
 		<p class="description">
@@ -311,6 +338,24 @@ class Custom_PWA_Config_Settings {
 				$post_type = sanitize_text_field( $post_type );
 				if ( isset( $post_types[ $post_type ] ) ) {
 					$sanitized['enabled_post_types'][] = $post_type;
+				}
+			}
+		}
+
+		// Post type roles.
+		$sanitized['post_type_roles'] = array();
+		if ( ! empty( $input['post_type_roles'] ) && is_array( $input['post_type_roles'] ) ) {
+			$valid_roles = array( 'blog', 'events', 'ecommerce', 'generic' );
+			
+			// Allow filtering of valid roles.
+			$valid_roles = array_keys( apply_filters( 'custom_pwa_valid_roles', array_combine( $valid_roles, $valid_roles ) ) );
+			
+			foreach ( $input['post_type_roles'] as $post_type => $role ) {
+				$post_type = sanitize_text_field( $post_type );
+				$role = sanitize_text_field( $role );
+				
+				if ( post_type_exists( $post_type ) && in_array( $role, $valid_roles, true ) ) {
+					$sanitized['post_type_roles'][ $post_type ] = $role;
 				}
 			}
 		}
@@ -396,5 +441,25 @@ class Custom_PWA_Config_Settings {
 	 */
 	public function is_local_dev_mode() {
 		return (bool) $this->get( 'local_dev_mode', false );
+	}
+
+	/**
+	 * Get post type roles configuration.
+	 *
+	 * @return array Associative array of post_type => role.
+	 */
+	public function get_post_type_roles() {
+		return (array) $this->get( 'post_type_roles', array() );
+	}
+
+	/**
+	 * Get the role assigned to a specific post type.
+	 *
+	 * @param string $post_type Post type name.
+	 * @return string Role key (defaults to 'generic').
+	 */
+	public function get_post_type_role( $post_type ) {
+		$roles = $this->get_post_type_roles();
+		return isset( $roles[ $post_type ] ) ? $roles[ $post_type ] : 'generic';
 	}
 }

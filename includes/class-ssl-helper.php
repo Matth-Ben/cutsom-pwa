@@ -222,10 +222,10 @@ class Custom_PWA_SSL_Helper {
 		$ssl_valid = $this->is_ssl_valid();
 
 		?>
-		<div class="wrap">
-			<h1><?php esc_html_e( 'SSL Setup Helper', 'custom-pwa' ); ?></h1>
+		<div class="wrap custom-pwa-admin-container">
+			<h1 class="custom-pwa-title"><?php esc_html_e( 'SSL Setup Helper', 'custom-pwa' ); ?></h1>
 			
-			<div class="card">
+			<div class="custom-pwa-card">
 				<h2><?php esc_html_e( 'Current Status', 'custom-pwa' ); ?></h2>
 				<table class="widefat">
 					<tbody>
@@ -288,14 +288,14 @@ class Custom_PWA_SSL_Helper {
 			</div>
 
 			<?php if ( ! $ssl_valid && $is_local ) : ?>
-			<div class="card">
+			<div class="custom-pwa-card">
 				<h2><?php esc_html_e( 'Installation Instructions', 'custom-pwa' ); ?></h2>
 				
 				<h3><?php esc_html_e( 'Option 1: Automatic Installation (Recommended)', 'custom-pwa' ); ?></h3>
 				<p><?php esc_html_e( 'Copy and paste this command in your terminal:', 'custom-pwa' ); ?></p>
-				<div style="background: #f0f0f1; padding: 15px; border-radius: 4px; margin: 10px 0;">
+				<div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid var(--cp-border);">
 					<code style="font-size: 14px;">cd <?php echo esc_html( CUSTOM_PWA_PLUGIN_DIR ); ?> && sudo bash install-mkcert.sh <?php echo esc_html( $host ); ?></code>
-					<button type="button" class="button button-small custom-pwa-copy-command" data-command="cd <?php echo esc_attr( CUSTOM_PWA_PLUGIN_DIR ); ?> && sudo bash install-mkcert.sh <?php echo esc_attr( $host ); ?>" style="margin-left: 10px;">
+					<button type="button" class="button cp-btn secondary button-small custom-pwa-copy-command" data-command="cd <?php echo esc_attr( CUSTOM_PWA_PLUGIN_DIR ); ?> && sudo bash install-mkcert.sh <?php echo esc_attr( $host ); ?>" style="margin-left: 10px;">
 						<?php esc_html_e( 'Copy Command', 'custom-pwa' ); ?>
 					</button>
 				</div>
@@ -305,7 +305,7 @@ class Custom_PWA_SSL_Helper {
 				<ol>
 					<li>
 						<strong><?php esc_html_e( 'Install mkcert:', 'custom-pwa' ); ?></strong>
-						<pre style="background: #f0f0f1; padding: 10px; border-radius: 4px;">sudo apt install libnss3-tools
+						<pre style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--cp-border);">sudo apt install libnss3-tools
 wget https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/mkcert-v1.4.4-linux-amd64
 sudo mv mkcert-v1.4.4-linux-amd64 /usr/local/bin/mkcert
 sudo chmod +x /usr/local/bin/mkcert
@@ -313,31 +313,31 @@ mkcert -install</pre>
 					</li>
 					<li>
 						<strong><?php esc_html_e( 'Generate certificate:', 'custom-pwa' ); ?></strong>
-						<pre style="background: #f0f0f1; padding: 10px; border-radius: 4px;">cd /tmp
+						<pre style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--cp-border);">cd /tmp
 mkcert <?php echo esc_html( $host ); ?>
 sudo mkdir -p /etc/nginx/ssl
 sudo cp <?php echo esc_html( $host ); ?>*.pem /etc/nginx/ssl/</pre>
 					</li>
 					<li>
 						<strong><?php esc_html_e( 'Update nginx config:', 'custom-pwa' ); ?></strong>
-						<pre style="background: #f0f0f1; padding: 10px; border-radius: 4px;">ssl_certificate /etc/nginx/ssl/<?php echo esc_html( $host ); ?>.pem;
+						<pre style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--cp-border);">ssl_certificate /etc/nginx/ssl/<?php echo esc_html( $host ); ?>.pem;
 ssl_certificate_key /etc/nginx/ssl/<?php echo esc_html( $host ); ?>-key.pem;</pre>
 					</li>
 					<li>
 						<strong><?php esc_html_e( 'Reload nginx:', 'custom-pwa' ); ?></strong>
-						<pre style="background: #f0f0f1; padding: 10px; border-radius: 4px;">sudo nginx -t
+						<pre style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--cp-border);">sudo nginx -t
 sudo systemctl reload nginx</pre>
 					</li>
 				</ol>
 
 				<h3><?php esc_html_e( 'Option 3: Chrome Development Flags (Temporary)', 'custom-pwa' ); ?></h3>
 				<p><?php esc_html_e( 'For quick testing only (not recommended for daily use):', 'custom-pwa' ); ?></p>
-				<pre style="background: #f0f0f1; padding: 10px; border-radius: 4px;">killall chrome
+				<pre style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--cp-border);">killall chrome
 google-chrome --ignore-certificate-errors --unsafely-treat-insecure-origin-as-secure=https://<?php echo esc_html( $host ); ?> --user-data-dir=/tmp/chrome-dev &</pre>
 				<p><strong style="color: red;"><?php esc_html_e( '⚠️ Warning: Only use this Chrome profile for local development. Never browse other websites with these flags!', 'custom-pwa' ); ?></strong></p>
 			</div>
 
-			<div class="card">
+			<div class="custom-pwa-card">
 				<h2><?php esc_html_e( 'After Installation', 'custom-pwa' ); ?></h2>
 				<ol>
 					<li><?php esc_html_e( 'Close and restart your browser completely', 'custom-pwa' ); ?></li>
@@ -346,7 +346,7 @@ google-chrome --ignore-certificate-errors --unsafely-treat-insecure-origin-as-se
 					<li><?php esc_html_e( 'Test push notifications from the Push menu', 'custom-pwa' ); ?></li>
 				</ol>
 				<p>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=custom_pwa_ssl_helper' ) ); ?>" class="button button-primary">
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=custom_pwa_ssl_helper' ) ); ?>" class="button cp-btn">
 						<?php esc_html_e( 'Refresh Status', 'custom-pwa' ); ?>
 					</a>
 				</p>
@@ -357,7 +357,7 @@ google-chrome --ignore-certificate-errors --unsafely-treat-insecure-origin-as-se
 			</div>
 			<?php endif; ?>
 
-			<div class="card">
+			<div class="custom-pwa-card">
 				<h2><?php esc_html_e( 'Additional Resources', 'custom-pwa' ); ?></h2>
 				<ul>
 					<li><a href="<?php echo esc_url( CUSTOM_PWA_PLUGIN_URL . 'SSL-SETUP.md' ); ?>" target="_blank"><?php esc_html_e( 'Complete SSL Setup Documentation', 'custom-pwa' ); ?></a></li>

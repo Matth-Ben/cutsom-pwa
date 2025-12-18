@@ -112,6 +112,10 @@ class Custom_PWA_Plugin {
 		require_once CUSTOM_PWA_PLUGIN_DIR . 'includes/class-config-settings.php';
 		require_once CUSTOM_PWA_PLUGIN_DIR . 'includes/class-pwa-settings.php';
 		require_once CUSTOM_PWA_PLUGIN_DIR . 'includes/class-push-settings.php';
+		require_once CUSTOM_PWA_PLUGIN_DIR . 'includes/class-push-scenarios.php';
+		require_once CUSTOM_PWA_PLUGIN_DIR . 'includes/class-push-rules.php';
+		require_once CUSTOM_PWA_PLUGIN_DIR . 'includes/class-custom-scenarios.php';
+		require_once CUSTOM_PWA_PLUGIN_DIR . 'includes/class-scenario-handlers.php';
 		require_once CUSTOM_PWA_PLUGIN_DIR . 'includes/class-subscriptions.php';
 		require_once CUSTOM_PWA_PLUGIN_DIR . 'includes/class-dispatcher.php';
 		require_once CUSTOM_PWA_PLUGIN_DIR . 'includes/class-ssl-helper.php';
