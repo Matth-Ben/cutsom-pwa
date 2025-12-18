@@ -2,6 +2,24 @@
 
 All notable changes to the Custom PWA plugin will be documented in this file.
 
+## [1.0.2] - 2025-12-18
+
+### Fixed
+- **Critical**: Fixed REST API authentication error causing 403 loop in admin
+  - Issue was caused by HTTPS local environment with self-signed certificate
+  - Added cookie configuration in `wp-config.php` (COOKIE_DOMAIN, COOKIEPATH, etc.)
+  - Resolved `/wp-json/wp/v2/users/me` 403 (Forbidden) error
+  - Fixed infinite loop in block editor (Gutenberg) console
+  - Improved REST API cookie authentication handling
+- **Manifest 404 error**: Fixed manifest.webmanifest not being served
+  - Requires running `wp rewrite flush` after plugin activation
+  - Rewrite rules properly registered for `/manifest.webmanifest` endpoint
+  - Added note in documentation about permalink flush requirement
+
+### Changed
+- Removed REST API authentication filters from plugin (not needed, was wp-config issue)
+- Cleaned up plugin code to focus on PWA functionality only
+
 ## [1.0.1] - 2025-12-16
 
 ### Fixed

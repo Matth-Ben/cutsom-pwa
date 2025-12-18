@@ -3,7 +3,7 @@
  * Plugin Name: Custom PWA
  * Plugin URI: https://example.com/custom-pwa
  * Description: Complete PWA configuration and Web Push notifications plugin for WordPress. Supports manifest generation, service worker examples, and push notifications for all post types including custom post types.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Your Name
  * Author URI: https://example.com
  * License: GPL v2 or later
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Main plugin constants.
  */
-define( 'CUSTOM_PWA_VERSION', '1.0.1' );
+define( 'CUSTOM_PWA_VERSION', '1.0.2' );
 define( 'CUSTOM_PWA_PLUGIN_FILE', __FILE__ );
 define( 'CUSTOM_PWA_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CUSTOM_PWA_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -123,6 +123,7 @@ class Custom_PWA_Plugin {
 		add_action( 'plugins_loaded', array( $this, 'init' ) );
 		add_action( 'init', array( $this, 'load_textdomain' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_scripts' ) );
+		add_action( 'admin_notices', array( $this, 'activation_notice' ) );
 		
 		// Register activation and deactivation hooks.
 		register_activation_hook( CUSTOM_PWA_PLUGIN_FILE, array( $this, 'activate' ) );
@@ -158,6 +159,23 @@ class Custom_PWA_Plugin {
 			false,
 			dirname( CUSTOM_PWA_PLUGIN_BASENAME ) . '/languages'
 		);
+	}
+
+	/**
+	 * Display activation notice.
+	 */
+	public function activation_notice() {
+		if ( get_transient( 'custom_pwa_activation_notice' ) ) {
+			?>
+			<div class="notice notice-success is-dismissible">
+				<p>
+					<strong><?php esc_html_e( 'Custom PWA', 'custom-pwa' ); ?></strong>: 
+					<?php esc_html_e( 'Plugin activated successfully! Permalinks have been flushed to register the manifest endpoint.', 'custom-pwa' ); ?>
+				</p>
+			</div>
+			<?php
+			delete_transient( 'custom_pwa_activation_notice' );
+		}
 	}
 
 	/**
@@ -228,6 +246,9 @@ class Custom_PWA_Plugin {
 
 		// Flush rewrite rules to register manifest endpoint.
 		flush_rewrite_rules();
+
+		// Set activation notice.
+		set_transient( 'custom_pwa_activation_notice', true, 5 );
 
 		do_action( 'custom_pwa_activated' );
 	}
