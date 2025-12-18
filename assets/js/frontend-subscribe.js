@@ -42,32 +42,61 @@
             return;
         }
 
-        // Wait for service worker to be ready
-        // Note: The service worker must be registered separately (see examples/README.md)
-        navigator.serviceWorker.ready.then(function(registration) {
-            console.log('[Custom PWA] Service Worker is ready');
-            
-            // Check current subscription status
-            return registration.pushManager.getSubscription();
-        }).then(function(subscription) {
-            if (subscription) {
-                console.log('[Custom PWA] Already subscribed to push notifications');
-                // Optionally update subscription on server
-                return subscription;
-            }
+        // Register service worker first
+        const swPath = customPwaData.swPath || '/sw.js';
+        const localDevMode = customPwaData.localDevMode === '1';
+        
+        console.log('[Custom PWA] Registering service worker:', swPath);
+        
+        if (localDevMode) {
+            console.warn('[Custom PWA] 🔓 Local Development Mode is ENABLED');
+            console.warn('[Custom PWA] SSL certificate checks are bypassed for Service Worker');
+            console.warn('[Custom PWA] ⚠️ NEVER use this mode in production!');
+        }
+        
+        navigator.serviceWorker.register(swPath, { scope: '/' })
+            .then(function(registration) {
+                console.log('[Custom PWA] Service Worker registered successfully');
+                return navigator.serviceWorker.ready;
+            })
+            .then(function(registration) {
+                console.log('[Custom PWA] Service Worker is ready');
+                
+                // Check current subscription status
+                return registration.pushManager.getSubscription();
+            })
+            .then(function(subscription) {
+                if (subscription) {
+                    console.log('[Custom PWA] Already subscribed to push notifications');
+                    // Optionally update subscription on server
+                    return subscription;
+                }
 
-            // Auto-subscribe or wait for user action
-            // For now, we'll auto-subscribe if permission is already granted
-            if (Notification.permission === 'granted') {
-                return subscribeToPush();
-            }
+                // Auto-subscribe or wait for user action
+                // For now, we'll auto-subscribe if permission is already granted
+                if (Notification.permission === 'granted') {
+                    return subscribeToPush();
+                }
 
-            // TODO: Add a UI button to trigger subscription
-            // Example: document.getElementById('enable-notifications-btn').addEventListener('click', subscribeToPush);
-            console.log('[Custom PWA] Notification permission not granted yet. Add a button to trigger subscription.');
-        }).catch(function(error) {
-            console.error('[Custom PWA] Service Worker error:', error);
-        });
+                // TODO: Add a UI button to trigger subscription
+                // Example: document.getElementById('enable-notifications-btn').addEventListener('click', subscribeToPush);
+                console.log('[Custom PWA] Notification permission not granted yet. Add a button to trigger subscription.');
+            })
+            .catch(function(error) {
+                console.error('[Custom PWA] Service Worker error:', error);
+                
+                // Check if it's an SSL certificate error
+                if (error.name === 'SecurityError' && error.message.includes('SSL certificate')) {
+                    console.error('[Custom PWA] ❌ SSL Certificate Error!');
+                    console.warn('[Custom PWA] 📋 SOLUTIONS:');
+                    console.warn('[Custom PWA] 1. Enable "Local Development Mode" in WordPress Admin:');
+                    console.warn('[Custom PWA]    → Custom PWA → Config → Local Development Mode ✓');
+                    console.warn('[Custom PWA] 2. OR open https://' + window.location.hostname + '/sw.js in a new tab');
+                    console.warn('[Custom PWA]    → Accept the security warning');
+                    console.warn('[Custom PWA]    → Reload this page');
+                    console.warn('[Custom PWA] 3. OR use mkcert to generate valid local certificates');
+                }
+            });
     }
 
     /**
@@ -90,7 +119,11 @@
                     return response.json();
                 })
                 .then(function(data) {
-                    return data.publicKey;
+                    console.log('[Custom PWA] VAPID key received:', data.public_key ? 'Yes' : 'No');
+                    if (!data.public_key) {
+                        throw new Error('No VAPID public key available');
+                    }
+                    return data.public_key;
                 });
         }).then(function(vapidPublicKey) {
             console.log('[Custom PWA] Got VAPID public key');

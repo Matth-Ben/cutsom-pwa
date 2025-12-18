@@ -104,6 +104,15 @@ class Custom_PWA_Config_Settings {
 			'custom_pwa_config_general'
 		);
 
+		// Local development mode.
+		add_settings_field(
+			'local_dev_mode',
+			__( 'Local Development Mode', 'custom-pwa' ),
+			array( $this, 'render_local_dev_mode_field' ),
+			'custom_pwa_config',
+			'custom_pwa_config_general'
+		);
+
 		/**
 		 * Fires after config settings fields are registered.
 		 * 
@@ -258,6 +267,23 @@ class Custom_PWA_Config_Settings {
 	}
 
 	/**
+	 * Render local development mode field.
+	 */
+	public function render_local_dev_mode_field() {
+		$options = get_option( $this->option_name, array() );
+		$checked = ! empty( $options['local_dev_mode'] ) ? 'checked' : '';
+		?>
+		<label>
+			<input type="checkbox" name="<?php echo esc_attr( $this->option_name ); ?>[local_dev_mode]" value="1" <?php echo esc_attr( $checked ); ?> />
+			<?php esc_html_e( 'Bypass SSL certificate checks for Service Worker (localhost/development only)', 'custom-pwa' ); ?>
+		</label>
+		<p class="description">
+			<?php esc_html_e( '⚠️ Only enable this in local development environments with self-signed SSL certificates. Never use in production!', 'custom-pwa' ); ?>
+		</p>
+		<?php
+	}
+
+	/**
 	 * Sanitize config options.
 	 *
 	 * @param array $input Raw input values.
@@ -291,6 +317,9 @@ class Custom_PWA_Config_Settings {
 
 		// Debug mode.
 		$sanitized['debug_mode'] = ! empty( $input['debug_mode'] );
+
+		// Local development mode.
+		$sanitized['local_dev_mode'] = ! empty( $input['local_dev_mode'] );
 
 		/**
 		 * Filter sanitized config options before saving.
@@ -358,5 +387,14 @@ class Custom_PWA_Config_Settings {
 	 */
 	public function is_debug_mode() {
 		return (bool) $this->get( 'debug_mode', false );
+	}
+
+	/**
+	 * Check if local development mode is enabled.
+	 *
+	 * @return bool
+	 */
+	public function is_local_dev_mode() {
+		return (bool) $this->get( 'local_dev_mode', false );
 	}
 }

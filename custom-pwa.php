@@ -3,7 +3,7 @@
  * Plugin Name: Custom PWA
  * Plugin URI: https://example.com/custom-pwa
  * Description: Complete PWA configuration and Web Push notifications plugin for WordPress. Supports manifest generation, service worker examples, and push notifications for all post types including custom post types.
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: Your Name
  * Author URI: https://example.com
  * License: GPL v2 or later
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Main plugin constants.
  */
-define( 'CUSTOM_PWA_VERSION', '1.0.2' );
+define( 'CUSTOM_PWA_VERSION', '1.0.3' );
 define( 'CUSTOM_PWA_PLUGIN_FILE', __FILE__ );
 define( 'CUSTOM_PWA_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CUSTOM_PWA_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -114,6 +114,7 @@ class Custom_PWA_Plugin {
 		require_once CUSTOM_PWA_PLUGIN_DIR . 'includes/class-push-settings.php';
 		require_once CUSTOM_PWA_PLUGIN_DIR . 'includes/class-subscriptions.php';
 		require_once CUSTOM_PWA_PLUGIN_DIR . 'includes/class-dispatcher.php';
+		require_once CUSTOM_PWA_PLUGIN_DIR . 'includes/class-ssl-helper.php';
 	}
 
 	/**
@@ -145,6 +146,11 @@ class Custom_PWA_Plugin {
 			$this->push_settings,
 			$this->config_settings
 		);
+
+		// Initialize SSL Helper (admin only).
+		if ( is_admin() ) {
+			new Custom_PWA_SSL_Helper();
+		}
 
 		// Allow other plugins to hook into our initialization.
 		do_action( 'custom_pwa_init', $this );
@@ -215,11 +221,16 @@ class Custom_PWA_Plugin {
 			);
 
 			// Localize script with data for both scripts
+			$push_settings = get_option( 'custom_pwa_push', array() );
+			$vapid_public_key = ! empty( $push_settings['public_key'] ) ? $push_settings['public_key'] : '';
+
 			$localize_data = array(
-				'restUrl'     => rest_url(),
-				'lang'        => get_bloginfo( 'language' ),
-				'swPath'      => '/sw.js',
-				'pushEnabled' => '1',
+				'restUrl'      => rest_url(),
+				'lang'         => get_bloginfo( 'language' ),
+				'swPath'       => '/sw.js',
+				'pushEnabled'  => '1',
+				'localDevMode' => ! empty( $config['local_dev_mode'] ) ? '1' : '0',
+				'vapidPublicKey' => $vapid_public_key,
 			);
 
 			wp_localize_script( 'custom-pwa-notification-popup', 'customPwaData', $localize_data );
@@ -269,12 +280,19 @@ class Custom_PWA_Plugin {
 	private function set_default_options() {
 		// Config defaults.
 		if ( false === get_option( 'custom_pwa_config' ) ) {
+			// Detect if running on localhost or local domain
+			$is_local = in_array( $_SERVER['HTTP_HOST'] ?? '', array( 'localhost', '127.0.0.1' ), true ) 
+			         || strpos( $_SERVER['HTTP_HOST'] ?? '', '.local' ) !== false
+			         || strpos( $_SERVER['HTTP_HOST'] ?? '', '.test' ) !== false
+			         || strpos( $_SERVER['HTTP_HOST'] ?? '', '.dev' ) !== false;
+			
 			$config_defaults = array(
-				'enable_pwa'        => false,
-				'enable_push'       => false,
-				'site_type'         => 'generic',
+				'enable_pwa'         => false,
+				'enable_push'        => false,
+				'site_type'          => 'generic',
 				'enabled_post_types' => array( 'post' ),
-				'debug_mode'        => false,
+				'debug_mode'         => false,
+				'local_dev_mode'     => $is_local, // Auto-enable for local environments
 			);
 			add_option( 'custom_pwa_config', $config_defaults );
 		}
@@ -299,6 +317,84 @@ class Custom_PWA_Plugin {
 			$push_defaults = array();
 			add_option( 'custom_pwa_push_rules', $push_defaults );
 		}
+
+		// Generate VAPID keys if they don't exist.
+		if ( false === get_option( 'custom_pwa_push' ) ) {
+			$vapid_keys = $this->generate_vapid_keys();
+			add_option( 'custom_pwa_push', $vapid_keys );
+		}
+	}
+
+	/**
+	 * Generate VAPID keys for Web Push.
+	 * 
+	 * @return array Array with 'public_key' and 'private_key'.
+	 */
+	private function generate_vapid_keys() {
+		// Generate a secure random key pair for VAPID.
+		// Web Push requires raw EC P-256 public key (65 bytes uncompressed).
+		
+		// Check if OpenSSL is available.
+		if ( ! function_exists( 'openssl_pkey_new' ) ) {
+			error_log( 'Custom PWA: OpenSSL is not available. Cannot generate VAPID keys.' );
+			return array(
+				'public_key'  => '',
+				'private_key' => '',
+			);
+		}
+
+		// Generate EC key pair (prime256v1 curve, which is P-256).
+		$config = array(
+			'private_key_type' => OPENSSL_KEYTYPE_EC,
+			'curve_name'       => 'prime256v1',
+		);
+
+		$key_resource = openssl_pkey_new( $config );
+		if ( ! $key_resource ) {
+			error_log( 'Custom PWA: Failed to generate VAPID key pair.' );
+			return array(
+				'public_key'  => '',
+				'private_key' => '',
+			);
+		}
+
+		// Export private key in PEM format.
+		$private_key_pem = '';
+		openssl_pkey_export( $key_resource, $private_key_pem );
+
+		// Get public key details and extract raw EC point.
+		$key_details = openssl_pkey_get_details( $key_resource );
+		$ec_key      = $key_details['ec'];
+		
+		// Extract X and Y coordinates (32 bytes each for P-256).
+		$x = $ec_key['x'];
+		$y = $ec_key['y'];
+		
+		// Pad to 32 bytes if needed.
+		$x = str_pad( $x, 32, "\0", STR_PAD_LEFT );
+		$y = str_pad( $y, 32, "\0", STR_PAD_LEFT );
+		
+		// Create uncompressed public key: 0x04 + X (32 bytes) + Y (32 bytes) = 65 bytes.
+		$public_key_raw = "\x04" . $x . $y;
+		
+		// Base64url encode both keys.
+		$public_key_base64url  = $this->base64url_encode( $public_key_raw );
+		$private_key_base64url = $this->base64url_encode( $private_key_pem );
+
+		return array(
+			'public_key'  => $public_key_base64url,
+			'private_key' => $private_key_base64url,
+		);
+	}
+
+	/**
+	 * Base64url encode a string.
+	 *
+	 * @param string $data Data to encode.
+	 * @return string Base64url encoded string.
+	 */
+	private function base64url_encode( $data ) {
+		return rtrim( strtr( base64_encode( $data ), '+/', '-_' ), '=' );
 	}
 
 	/**

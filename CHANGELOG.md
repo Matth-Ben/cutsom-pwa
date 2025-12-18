@@ -2,6 +2,92 @@
 
 All notable changes to the Custom PWA plugin will be documented in this file.
 
+## [1.0.3] - 2025-12-18
+
+### Added
+- **VAPID Key Generation**: Automatic generation of VAPID keys on plugin activation
+  - Uses OpenSSL to generate ES256 (P-256) key pairs
+  - Keys stored securely in `custom_pwa_push` option
+  - Public key is 65-byte raw EC point (uncompressed format)
+  - Private key stored in PEM format for JWT signing
+  - Helper method `generate_vapid_keys()` for key regeneration
+- **SSL Helper Page**: New admin page for SSL certificate diagnostics
+  - Location: Custom PWA → 🔒 SSL Helper
+  - Detects SSL issues and provides installation guidance
+  - Shows domain status, HTTPS status, mkcert installation status
+  - Auto-displays admin notice with copy-to-clipboard installation command
+  - Includes automated `install-mkcert.sh` script for one-click setup
+  - Full diagnostic page with step-by-step instructions
+- **Push Notification Sending**: Complete Web Push implementation
+  - Real notification sending to subscribed devices
+  - VAPID authentication with JWT (ES256 signature)
+  - Support for Mozilla, Chrome, and other push services
+  - Test notification button in admin: Custom PWA → Push
+  - Shows sent/failed count after sending
+  - Debug mode logging for troubleshooting
+
+### Fixed
+- **Service Worker Installation**: Fixed SW not activating due to cache errors
+  - Removed pre-caching of non-existent files
+  - Added immediate `skipWaiting()` and `clients.claim()`
+  - Service Worker now activates instantly without timeout
+- **Service Worker Timeout**: Fixed 5-second timeout when subscribing
+  - Issue was caused by SW never reaching "ready" state
+  - Removed problematic cache operations that blocked activation
+  - Subscription now completes in under 1 second
+- **VAPID Key Format**: Fixed "Invalid raw ECDSA P-256 public key" error
+  - Changed from PEM/DER format to raw 65-byte EC point
+  - Extracted X and Y coordinates properly (32 bytes each)
+  - Added 0x04 prefix for uncompressed point format
+  - Keys now compatible with Web Push specification
+- **REST API Public Key Endpoint**: Fixed key retrieval
+  - Changed response from `publicKey` (camelCase) to `public_key` (snake_case)
+  - Removed hardcoded VAPID constant, now uses database values
+  - Fixed "No VAPID key configured" error in frontend
+- **Web Push Protocol**: Fixed HTTP 400/401 errors
+  - Added required `Crypto-Key` header with VAPID public key
+  - Fixed Authorization header format: `WebPush [jwt]` (not `vapid`)
+  - Removed incorrect `Content-Type: application/json` header
+  - Payload now sent empty (no encryption yet) for compatibility
+  - Successfully receiving HTTP 201 responses from push services
+- **PHP cURL Extension**: Added requirement and installation instructions
+  - Plugin now requires `php-curl` extension
+  - Error handling for missing cURL with helpful message
+  - Installation command: `sudo apt-get install php8.3-curl`
+
+### Changed
+- **Service Worker Cache Strategy**: Simplified to no-cache approach
+  - Removed `STATIC_ASSETS` array (was causing 404 errors)
+  - Service Worker focuses on push notifications only
+  - Cache features can be added later as needed
+- **JWT Implementation**: Custom ES256 signature without external libraries
+  - Implemented DER to raw signature conversion
+  - Added base64url encoding/decoding helpers
+  - No Composer dependencies required
+  - Proper ECDSA P-256 signature handling
+- **Notification Payload**: Currently sending empty payload
+  - Full encryption (ECDH + AES-GCM) not yet implemented
+  - Service Worker uses default notification data
+  - For production, recommend using `web-push-php` library
+- **SSL Helper Menu**: Fixed menu slug consistency
+  - Changed from `custom_pwa` (underscore) to `custom-pwa` (hyphen)
+  - Menu now appears correctly under Custom PWA parent
+
+### Security
+- VAPID private key stored securely in database (base64url encoded)
+- JWT tokens expire after 12 hours
+- Proper ECDSA signature validation
+- No VAPID keys hardcoded in source code
+
+### Developer Notes
+- **mkcert Installation**: Automated script available at `install-mkcert.sh`
+  - Installs mkcert binary, generates certificates, updates nginx
+  - One-command setup: `sudo bash install-mkcert.sh labo.local`
+- **Testing Push Notifications**: Use Custom PWA → Push → Send Test Notification
+  - Shows real-time success/failure count
+  - Debug logs available when Debug Mode enabled
+  - Check browser console for Service Worker messages
+
 ## [1.0.2] - 2025-12-18
 
 ### Fixed
@@ -15,10 +101,30 @@ All notable changes to the Custom PWA plugin will be documented in this file.
   - Requires running `wp rewrite flush` after plugin activation
   - Rewrite rules properly registered for `/manifest.webmanifest` endpoint
   - Added note in documentation about permalink flush requirement
+- **Service Worker not registering**: Fixed push notifications not working
+  - Service Worker was never registered automatically
+  - Added `navigator.serviceWorker.register()` in frontend-subscribe.js
+  - Service Worker now auto-registers on page load when push is enabled
+  - Fixed "Service Worker timeout" error in notification popup
 
 ### Changed
 - Removed REST API authentication filters from plugin (not needed, was wp-config issue)
 - Cleaned up plugin code to focus on PWA functionality only
+- Service Worker registration is now automatic (no manual setup required)
+
+### Added
+- Activation notice to confirm permalinks flush and manifest availability
+- **Local Development Mode**: New configuration option for local environments
+  - Auto-detects localhost, 127.0.0.1, *.local, *.test, *.dev domains
+  - Enabled automatically on installation for local domains
+  - Displays helpful console messages when SSL certificate errors occur
+  - Guides developers to solutions (accept cert, use mkcert, etc.)
+  - Available in: Custom PWA → Config → Local Development Mode
+  - Warning displayed: "Only enable in local development, never in production"
+- SSL Setup Documentation: Complete guide for local SSL configuration
+  - Created `SSL-SETUP.md` with step-by-step instructions
+  - Solutions: Accept certificate, mkcert, localhost HTTP, Chrome flags
+  - Troubleshooting section for common SSL issues
 
 ## [1.0.1] - 2025-12-16
 

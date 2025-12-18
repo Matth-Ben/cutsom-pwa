@@ -31,16 +31,6 @@ class Custom_PWA_Subscriptions {
 	const DB_VERSION = '1.0';
 
 	/**
-	 * VAPID public key (placeholder - should be generated and stored securely).
-	 * 
-	 * In production, generate real VAPID keys and store them securely.
-	 * Example: openssl ecparam -name prime256v1 -genkey -noout -out vapid_private.pem
-	 *
-	 * @var string
-	 */
-	const VAPID_PUBLIC_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -161,9 +151,12 @@ class Custom_PWA_Subscriptions {
 	 * @return WP_REST_Response Response.
 	 */
 	public function get_public_key( $request ) {
+		$push_settings = get_option( 'custom_pwa_push', array() );
+		$public_key = ! empty( $push_settings['public_key'] ) ? $push_settings['public_key'] : '';
+
 		return new WP_REST_Response(
 			array(
-				'publicKey' => self::VAPID_PUBLIC_KEY,
+				'public_key' => $public_key,
 			),
 			200
 		);

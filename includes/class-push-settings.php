@@ -357,29 +357,264 @@ class Custom_PWA_Push_Settings {
 			get_current_blog_id()
 		) );
 
-		// TODO: Actually send push notifications.
-		// For now, just log the attempt.
-		if ( get_option( 'custom_pwa_config' )['debug_mode'] ?? false ) {
-			error_log( sprintf(
-				'[Custom PWA] Test push notification: title=%s, body=%s, url=%s, subscriptions=%d',
-				$title,
-				$body,
-				$url,
-				$count
-			) );
+		// Get all active subscriptions.
+		$subscriptions = $wpdb->get_results( $wpdb->prepare(
+			"SELECT * FROM {$table_name} WHERE active = %d AND blog_id = %d",
+			1,
+			get_current_blog_id()
+		) );
+
+		if ( empty( $subscriptions ) ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'No active subscriptions found.', 'custom-pwa' ),
+				),
+				200
+			);
+		}
+
+		// Send notification to all subscriptions.
+		$sent_count = 0;
+		$failed_count = 0;
+
+		foreach ( $subscriptions as $subscription ) {
+			$payload = array(
+				'title' => $title,
+				'body'  => $body,
+				'icon'  => get_site_icon_url( 192 ),
+				'badge' => get_site_icon_url( 96 ),
+				'data'  => array(
+					'url' => $url,
+				),
+			);
+
+			$result = $this->send_push_notification( $subscription, $payload );
+			if ( $result ) {
+				$sent_count++;
+			} else {
+				$failed_count++;
+			}
 		}
 
 		return new WP_REST_Response(
 			array(
-				'success' => true,
+				'success' => $sent_count > 0,
 				'message' => sprintf(
-					/* translators: %d: number of subscriptions */
-					__( 'Test notification prepared for %d subscriptions. (Real sending requires Web Push library integration.)', 'custom-pwa' ),
-					$count
+					/* translators: %1$d: sent count, %2$d: failed count */
+					__( 'Sent: %1$d, Failed: %2$d', 'custom-pwa' ),
+					$sent_count,
+					$failed_count
 				),
 			),
 			200
 		);
+	}
+
+	/**
+	 * Send push notification to a subscription.
+	 *
+	 * @param object $subscription Subscription object from database.
+	 * @param array  $payload      Notification payload.
+	 * @return bool True on success, false on failure.
+	 */
+	private function send_push_notification( $subscription, $payload ) {
+		// Get VAPID keys from options.
+		$push_config = get_option( 'custom_pwa_push', array() );
+		$vapid_public_key  = ! empty( $push_config['public_key'] ) ? $push_config['public_key'] : '';
+		$vapid_private_key = ! empty( $push_config['private_key'] ) ? $push_config['private_key'] : '';
+
+		if ( empty( $vapid_public_key ) || empty( $vapid_private_key ) ) {
+			error_log( '[Custom PWA] VAPID keys not configured' );
+			return false;
+		}
+
+		// Prepare the notification data (must be encrypted for Web Push).
+		// For now, we'll send an empty payload and let the service worker use default data.
+		$notification_data = '';
+
+		// Parse the endpoint to get the audience (origin).
+		$url_parts = wp_parse_url( $subscription->endpoint );
+		$audience  = sprintf( '%s://%s', $url_parts['scheme'], $url_parts['host'] );
+
+		// Create JWT token for VAPID authentication.
+		$jwt = $this->create_vapid_jwt( $audience, $vapid_private_key );
+		if ( ! $jwt ) {
+			return false;
+		}
+
+		// Send the notification using cURL.
+		$ch = curl_init( $subscription->endpoint );
+		curl_setopt( $ch, CURLOPT_POST, true );
+		curl_setopt( $ch, CURLOPT_POSTFIELDS, $notification_data );
+		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+		curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
+			'Content-Length: ' . strlen( $notification_data ),
+			'TTL: 86400', // 24 hours.
+			'Crypto-Key: p256ecdsa=' . $vapid_public_key,
+			'Authorization: WebPush ' . $jwt,
+		) );
+
+		$response = curl_exec( $ch );
+		$http_code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+		curl_close( $ch );
+
+		// Log if debug mode is enabled.
+		if ( get_option( 'custom_pwa_config' )['debug_mode'] ?? false ) {
+			error_log( sprintf(
+				'[Custom PWA] Push notification sent to %s... | HTTP %d | Response: %s',
+				substr( $subscription->endpoint, 0, 50 ),
+				$http_code,
+				$response
+			) );
+		}
+
+		// Check if the request was successful (2xx status code).
+		return $http_code >= 200 && $http_code < 300;
+	}
+
+	/**
+	 * Create VAPID JWT token.
+	 *
+	 * @param string $audience Audience (push service origin).
+	 * @param string $private_key_base64url VAPID private key (base64url encoded PEM).
+	 * @return string|false JWT token or false on failure.
+	 */
+	private function create_vapid_jwt( $audience, $private_key_base64url ) {
+		// Decode the base64url private key.
+		$private_key_pem = $this->base64url_decode( $private_key_base64url );
+
+		// JWT header.
+		$header = array(
+			'typ' => 'JWT',
+			'alg' => 'ES256',
+		);
+
+		// JWT payload.
+		$payload = array(
+			'aud' => $audience,
+			'exp' => time() + 43200, // 12 hours.
+			'sub' => 'mailto:' . get_bloginfo( 'admin_email' ),
+		);
+
+		// Encode header and payload.
+		$header_encoded  = $this->base64url_encode( wp_json_encode( $header ) );
+		$payload_encoded = $this->base64url_encode( wp_json_encode( $payload ) );
+
+		// Create the signature input.
+		$signature_input = $header_encoded . '.' . $payload_encoded;
+
+		// Sign with private key using ES256 (ECDSA with SHA-256).
+		$private_key = openssl_pkey_get_private( $private_key_pem );
+		if ( ! $private_key ) {
+			error_log( '[Custom PWA] Failed to load VAPID private key for JWT signing' );
+			return false;
+		}
+
+		$signature = '';
+		$success   = openssl_sign( $signature_input, $signature, $private_key, OPENSSL_ALGO_SHA256 );
+		openssl_free_key( $private_key );
+
+		if ( ! $success ) {
+			error_log( '[Custom PWA] Failed to sign JWT with VAPID private key' );
+			return false;
+		}
+
+		// Convert DER signature to raw signature (required for JWT ES256).
+		$signature_raw = $this->der_to_raw_signature( $signature );
+		if ( ! $signature_raw ) {
+			error_log( '[Custom PWA] Failed to convert DER signature to raw format' );
+			return false;
+		}
+
+		// Encode signature.
+		$signature_encoded = $this->base64url_encode( $signature_raw );
+
+		// Return the complete JWT.
+		return $signature_input . '.' . $signature_encoded;
+	}
+
+	/**
+	 * Convert DER-encoded ECDSA signature to raw format (R + S).
+	 *
+	 * @param string $der_signature DER-encoded signature.
+	 * @return string|false Raw signature (64 bytes for P-256) or false on failure.
+	 */
+	private function der_to_raw_signature( $der_signature ) {
+		$offset = 0;
+		$length = strlen( $der_signature );
+
+		// Check sequence marker (0x30).
+		if ( $offset >= $length || ord( $der_signature[ $offset ] ) !== 0x30 ) {
+			return false;
+		}
+		$offset++;
+
+		// Skip sequence length.
+		$sequence_length = ord( $der_signature[ $offset ] );
+		$offset++;
+
+		// Read R integer.
+		if ( $offset >= $length || ord( $der_signature[ $offset ] ) !== 0x02 ) {
+			return false;
+		}
+		$offset++;
+
+		$r_length = ord( $der_signature[ $offset ] );
+		$offset++;
+
+		$r = substr( $der_signature, $offset, $r_length );
+		$offset += $r_length;
+
+		// Remove leading zero byte if present.
+		if ( strlen( $r ) === 33 && ord( $r[0] ) === 0x00 ) {
+			$r = substr( $r, 1 );
+		}
+
+		// Pad to 32 bytes.
+		$r = str_pad( $r, 32, "\x00", STR_PAD_LEFT );
+
+		// Read S integer.
+		if ( $offset >= $length || ord( $der_signature[ $offset ] ) !== 0x02 ) {
+			return false;
+		}
+		$offset++;
+
+		$s_length = ord( $der_signature[ $offset ] );
+		$offset++;
+
+		$s = substr( $der_signature, $offset, $s_length );
+
+		// Remove leading zero byte if present.
+		if ( strlen( $s ) === 33 && ord( $s[0] ) === 0x00 ) {
+			$s = substr( $s, 1 );
+		}
+
+		// Pad to 32 bytes.
+		$s = str_pad( $s, 32, "\x00", STR_PAD_LEFT );
+
+		// Return R + S (64 bytes total).
+		return $r . $s;
+	}
+
+	/**
+	 * Base64url encode a string.
+	 *
+	 * @param string $data Data to encode.
+	 * @return string Base64url encoded string.
+	 */
+	private function base64url_encode( $data ) {
+		return rtrim( strtr( base64_encode( $data ), '+/', '-_' ), '=' );
+	}
+
+	/**
+	 * Base64url decode a string.
+	 *
+	 * @param string $data Base64url encoded string.
+	 * @return string Decoded data.
+	 */
+	private function base64url_decode( $data ) {
+		return base64_decode( strtr( $data, '-_', '+/' ) );
 	}
 
 	/**
