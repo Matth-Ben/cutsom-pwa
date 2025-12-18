@@ -188,9 +188,32 @@ class Custom_PWA_Plugin {
 	 * Enqueue frontend scripts.
 	 */
 	public function enqueue_frontend_scripts() {
-		// Check if Push is enabled.
+		// Check if PWA and/or Push is enabled.
 		$config = get_option( 'custom_pwa_config', array() );
+		$pwa_enabled = ! empty( $config['enable_pwa'] );
 		$push_enabled = ! empty( $config['enable_push'] );
+
+		// If PWA is enabled, we need to register the Service Worker
+		// even if Push is disabled, for the app to be installable
+		if ( $pwa_enabled ) {
+			// Enqueue SW registration script
+			wp_enqueue_script(
+				'custom-pwa-sw-register',
+				CUSTOM_PWA_PLUGIN_URL . 'assets/js/sw-register.js',
+				array(),
+				CUSTOM_PWA_VERSION,
+				true
+			);
+
+			$sw_data = array(
+				'swPath'       => '/sw.js',
+				'pwaEnabled'   => '1',
+				'pushEnabled'  => $push_enabled ? '1' : '0',
+				'localDevMode' => ! empty( $config['local_dev_mode'] ) ? '1' : '0',
+			);
+
+			wp_localize_script( 'custom-pwa-sw-register', 'customPwaData', $sw_data );
+		}
 
 		// Enqueue notification popup styles and script if push is enabled
 		if ( $push_enabled ) {
@@ -211,11 +234,11 @@ class Custom_PWA_Plugin {
 				true
 			);
 
-			// Enqueue subscribe script
+			// Enqueue subscribe script (depends on SW being registered)
 			wp_enqueue_script(
 				'custom-pwa-subscribe',
 				CUSTOM_PWA_PLUGIN_URL . 'assets/js/frontend-subscribe.js',
-				array(),
+				array( 'custom-pwa-sw-register' ),
 				CUSTOM_PWA_VERSION,
 				true
 			);
@@ -225,11 +248,12 @@ class Custom_PWA_Plugin {
 			$vapid_public_key = ! empty( $push_settings['public_key'] ) ? $push_settings['public_key'] : '';
 
 			$localize_data = array(
-				'restUrl'      => rest_url(),
-				'lang'         => get_bloginfo( 'language' ),
-				'swPath'       => '/sw.js',
-				'pushEnabled'  => '1',
-				'localDevMode' => ! empty( $config['local_dev_mode'] ) ? '1' : '0',
+				'restUrl'        => rest_url(),
+				'lang'           => get_bloginfo( 'language' ),
+				'swPath'         => '/sw.js',
+				'pwaEnabled'     => '1',
+				'pushEnabled'    => '1',
+				'localDevMode'   => ! empty( $config['local_dev_mode'] ) ? '1' : '0',
 				'vapidPublicKey' => $vapid_public_key,
 			);
 

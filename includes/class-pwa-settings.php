@@ -650,16 +650,29 @@ class Custom_PWA_Settings {
 				if ( $icon_path && file_exists( $icon_path ) ) {
 					$image_size = getimagesize( $icon_path );
 					if ( $image_size ) {
-						$actual_size = $image_size[0] . 'x' . $image_size[1];
+						$width = $image_size[0];
+						$height = $image_size[1];
 						$mime_type = $image_size['mime'];
 						
-						// Add icon with actual size
-						$icons[] = array(
-							'src'     => $icon_url,
-							'sizes'   => $actual_size,
-							'type'    => $mime_type,
-							'purpose' => 'any maskable',
-						);
+						// Add the actual size of the icon
+						// Chrome requires at least 192x192, so check that
+						if ( $width >= 192 && $height >= 192 ) {
+							// Add icon with actual size and 'any' purpose
+							$icons[] = array(
+								'src'     => $icon_url,
+								'sizes'   => $width . 'x' . $height,
+								'type'    => $mime_type,
+								'purpose' => 'any',
+							);
+							
+							// Also add a maskable version for better Android support
+							$icons[] = array(
+								'src'     => $icon_url,
+								'sizes'   => $width . 'x' . $height,
+								'type'    => $mime_type,
+								'purpose' => 'maskable',
+							);
+						}
 					}
 				}
 			}

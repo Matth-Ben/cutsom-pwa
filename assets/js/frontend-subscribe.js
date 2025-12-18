@@ -42,25 +42,13 @@
             return;
         }
 
-        // Register service worker first
-        const swPath = customPwaData.swPath || '/sw.js';
-        const localDevMode = customPwaData.localDevMode === '1';
+        // Service Worker should already be registered by sw-register.js
+        // Wait for it to be ready
+        console.log('[Custom PWA] Waiting for Service Worker to be ready...');
         
-        console.log('[Custom PWA] Registering service worker:', swPath);
-        
-        if (localDevMode) {
-            console.warn('[Custom PWA] 🔓 Local Development Mode is ENABLED');
-            console.warn('[Custom PWA] SSL certificate checks are bypassed for Service Worker');
-            console.warn('[Custom PWA] ⚠️ NEVER use this mode in production!');
-        }
-        
-        navigator.serviceWorker.register(swPath, { scope: '/' })
+        navigator.serviceWorker.ready
             .then(function(registration) {
-                console.log('[Custom PWA] Service Worker registered successfully');
-                return navigator.serviceWorker.ready;
-            })
-            .then(function(registration) {
-                console.log('[Custom PWA] Service Worker is ready');
+                console.log('[Custom PWA] Service Worker is ready for push notifications');
                 
                 // Check current subscription status
                 return registration.pushManager.getSubscription();

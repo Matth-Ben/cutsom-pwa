@@ -25,8 +25,28 @@ All notable changes to the Custom PWA plugin will be documented in this file.
   - Test notification button in admin: Custom PWA → Push
   - Shows sent/failed count after sending
   - Debug mode logging for troubleshooting
+- **Separate Service Worker Registration**: New `sw-register.js` script
+  - Decouples Service Worker registration from push notifications
+  - Allows PWA installation even when push is disabled
+  - Proper logging and error handling
+  - Fixes Chrome installability requirements
 
 ### Fixed
+- **PWA Installability**: Fixed Service Worker not registering for PWA-only mode
+  - Service Worker now registers when PWA is enabled, regardless of push status
+  - Separated SW registration logic from push notification logic
+  - Chrome now properly detects the app as installable
+  - Install prompt appears in Chrome menu (⋮ → "Install Labo...")
+- **Script Loading**: Fixed `customPwaData` variable conflicts
+  - Added `pwaEnabled` property to all `wp_localize_script` calls
+  - Prevents later scripts from overwriting SW registration data
+  - Consistent data structure across all frontend scripts
+- **Manifest Icons**: Fixed icon size declaration errors
+  - Icons now declare actual image dimensions (256x256)
+  - Removed fake size declarations (192x192, 512x512)
+  - Fixed "Actual size does not match specified size" Chrome warnings
+  - Changed from `any maskable` to separate `any` and `maskable` entries
+  - Chrome DevTools no longer shows icon errors
 - **Service Worker Installation**: Fixed SW not activating due to cache errors
   - Removed pre-caching of non-existent files
   - Added immediate `skipWaiting()` and `clients.claim()`
@@ -56,6 +76,11 @@ All notable changes to the Custom PWA plugin will be documented in this file.
   - Installation command: `sudo apt-get install php8.3-curl`
 
 ### Changed
+- **Service Worker Registration Architecture**: Separated concerns
+  - Created dedicated `sw-register.js` for Service Worker registration
+  - `frontend-subscribe.js` now assumes SW is already registered
+  - Improved script dependencies: subscribe depends on SW registration
+  - Better error handling and console logging
 - **Service Worker Cache Strategy**: Simplified to no-cache approach
   - Removed `STATIC_ASSETS` array (was causing 404 errors)
   - Service Worker focuses on push notifications only
