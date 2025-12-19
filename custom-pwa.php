@@ -3,7 +3,7 @@
  * Plugin Name: Custom PWA
  * Plugin URI: https://example.com/custom-pwa
  * Description: Complete PWA configuration and Web Push notifications plugin for WordPress. Supports manifest generation, service worker examples, and push notifications for all post types including custom post types.
- * Version: 1.0.3
+ * Version: 1.0.5
  * Author: Your Name
  * Author URI: https://example.com
  * License: GPL v2 or later
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Main plugin constants.
  */
-define( 'CUSTOM_PWA_VERSION', '1.0.3' );
+define( 'CUSTOM_PWA_VERSION', '1.0.5' );
 define( 'CUSTOM_PWA_PLUGIN_FILE', __FILE__ );
 define( 'CUSTOM_PWA_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CUSTOM_PWA_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -127,6 +127,7 @@ class Custom_PWA_Plugin {
 	private function init_hooks() {
 		add_action( 'plugins_loaded', array( $this, 'init' ) );
 		add_action( 'init', array( $this, 'load_textdomain' ) );
+		add_action( 'init', array( $this, 'maybe_flush_rewrite_rules' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_scripts' ) );
 		add_action( 'admin_notices', array( $this, 'activation_notice' ) );
 		
@@ -180,11 +181,23 @@ class Custom_PWA_Plugin {
 			<div class="notice notice-success is-dismissible">
 				<p>
 					<strong><?php esc_html_e( 'Custom PWA', 'custom-pwa' ); ?></strong>: 
-					<?php esc_html_e( 'Plugin activated successfully! Permalinks have been flushed to register the manifest endpoint.', 'custom-pwa' ); ?>
+					<?php esc_html_e( 'Plugin activated successfully! All files have been installed and the manifest endpoint is ready.', 'custom-pwa' ); ?>
 				</p>
 			</div>
 			<?php
 			delete_transient( 'custom_pwa_activation_notice' );
+		}
+	}
+	
+	/**
+	 * Flush rewrite rules if the transient is set.
+	 * This is called on 'init' after activation to ensure manifest endpoint works.
+	 */
+	public function maybe_flush_rewrite_rules() {
+		if ( get_transient( 'custom_pwa_flush_rewrite_rules' ) ) {
+			flush_rewrite_rules();
+			delete_transient( 'custom_pwa_flush_rewrite_rules' );
+			$this->log( 'Rewrite rules flushed for manifest endpoint' );
 		}
 	}
 
@@ -282,14 +295,91 @@ class Custom_PWA_Plugin {
 
 		// Set default options if they don't exist.
 		$this->set_default_options();
+		
+		// Copy required files to site root.
+		$this->copy_required_files();
 
-		// Flush rewrite rules to register manifest endpoint.
-		flush_rewrite_rules();
+		// Set flag to flush rewrite rules on next init (required for manifest endpoint).
+		// We can't flush now because hooks aren't registered yet during activation.
+		set_transient( 'custom_pwa_flush_rewrite_rules', true, 60 );
 
 		// Set activation notice.
 		set_transient( 'custom_pwa_activation_notice', true, 5 );
 
 		do_action( 'custom_pwa_activated' );
+	}
+	
+	/**
+	 * Copy required PWA files to the site root.
+	 * Copies service worker and offline page from plugin examples to site root.
+	 */
+	private function copy_required_files() {
+		$site_root = ABSPATH;
+		$examples_dir = CUSTOM_PWA_PLUGIN_DIR . 'assets/examples/';
+		
+		$files_to_copy = array(
+			'sw-example.js' => 'sw.js',
+			'offline-example.html' => 'offline.html',
+		);
+		
+		$copied = array();
+		$errors = array();
+		
+		foreach ( $files_to_copy as $source_name => $dest_name ) {
+			$source = $examples_dir . $source_name;
+			$dest = $site_root . $dest_name;
+			
+			// Check if source file exists.
+			if ( ! file_exists( $source ) ) {
+				$errors[] = sprintf( 'Source file not found: %s', $source_name );
+				continue;
+			}
+			
+			// Check if destination already exists (don't overwrite).
+			if ( file_exists( $dest ) ) {
+				// File already exists, check if it's writable for future updates.
+				if ( ! is_writable( $dest ) ) {
+					$errors[] = sprintf( 'File exists but not writable: %s', $dest_name );
+				}
+				continue;
+			}
+			
+			// Try to copy the file.
+			if ( @copy( $source, $dest ) ) {
+				@chmod( $dest, 0644 );
+				$copied[] = $dest_name;
+				$this->log( sprintf( 'Copied %s to site root', $dest_name ) );
+			} else {
+				$errors[] = sprintf( 'Failed to copy %s (check permissions)', $dest_name );
+			}
+		}
+		
+		// Store copy status for the installation tab.
+		update_option( 'custom_pwa_file_copy_status', array(
+			'copied' => $copied,
+			'errors' => $errors,
+			'timestamp' => current_time( 'mysql' ),
+		) );
+		
+		// Log results.
+		if ( ! empty( $copied ) ) {
+			$this->log( sprintf( 'Successfully copied files: %s', implode( ', ', $copied ) ) );
+		}
+		
+		if ( ! empty( $errors ) ) {
+			$this->log( sprintf( 'File copy errors: %s', implode( ', ', $errors ) ) );
+		}
+	}
+	
+	/**
+	 * Log a message if debug mode is enabled.
+	 * 
+	 * @param string $message The message to log.
+	 */
+	private function log( $message ) {
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( '[Custom PWA] ' . $message );
+		}
 	}
 
 	/**
@@ -340,10 +430,18 @@ class Custom_PWA_Plugin {
 			add_option( 'custom_pwa_settings', $pwa_defaults );
 		}
 
-		// Push defaults.
+		// Push defaults with scenarios.
 		if ( false === get_option( 'custom_pwa_push_rules' ) ) {
 			$push_defaults = array();
 			add_option( 'custom_pwa_push_rules', $push_defaults );
+		}
+		
+		// Initialize default scenarios for all post types.
+		$this->initialize_default_scenarios();
+		
+		// Custom scenarios defaults.
+		if ( false === get_option( 'custom_pwa_custom_scenarios' ) ) {
+			add_option( 'custom_pwa_custom_scenarios', array() );
 		}
 
 		// Generate VAPID keys if they don't exist.
@@ -351,6 +449,116 @@ class Custom_PWA_Plugin {
 			$vapid_keys = $this->generate_vapid_keys();
 			add_option( 'custom_pwa_push', $vapid_keys );
 		}
+	}
+	
+	/**
+	 * Initialize default scenarios for all registered post types.
+	 * Creates the scenarios structure for post, page, and any custom post types.
+	 */
+	private function initialize_default_scenarios() {
+		// Load required classes.
+		require_once CUSTOM_PWA_PLUGIN_DIR . 'includes/class-push-scenarios.php';
+		require_once CUSTOM_PWA_PLUGIN_DIR . 'includes/class-push-rules.php';
+		
+		// Get all public post types.
+		$post_types = get_post_types( array( 'public' => true ), 'names' );
+		
+		// Get existing rules.
+		$all_rules = get_option( 'custom_pwa_push_rules', array() );
+		
+		// Initialize scenarios for each post type if not already set.
+		foreach ( $post_types as $post_type ) {
+			// Skip if this post type already has scenarios configured.
+			if ( isset( $all_rules[ $post_type ] ) && ! empty( $all_rules[ $post_type ]['scenarios'] ) ) {
+				continue;
+			}
+			
+			// Detect the role/category of this post type.
+			$role = $this->detect_post_type_role( $post_type );
+			
+			// Get default scenarios for this role.
+			$scenarios = Custom_PWA_Push_Scenarios::get_scenarios_for_role( $role );
+			
+			// Initialize the post type with default configuration.
+			$all_rules[ $post_type ] = array(
+				'config' => array(
+					'enabled' => false, // Disabled by default, user must enable
+				),
+				'scenarios' => array(),
+			);
+			
+			// Add each scenario with default disabled state.
+			foreach ( $scenarios as $scenario_key => $scenario_data ) {
+				$all_rules[ $post_type ]['scenarios'][ $scenario_key ] = array(
+					'key'            => $scenario_key,
+					'enabled'        => false, // Disabled by default
+					'title_template' => $scenario_data['default_title'],
+					'body_template'  => $scenario_data['default_body'],
+					'url_template'   => $scenario_data['default_url'],
+					'fields'         => array(),
+				);
+				
+				// Initialize field values if the scenario has fields.
+				if ( ! empty( $scenario_data['fields'] ) ) {
+					foreach ( $scenario_data['fields'] as $field_key => $field_config ) {
+						$all_rules[ $post_type ]['scenarios'][ $scenario_key ]['fields'][ $field_key ] = 
+							isset( $field_config['default'] ) ? $field_config['default'] : '';
+					}
+				}
+			}
+		}
+		
+		// Save the initialized rules.
+		update_option( 'custom_pwa_push_rules', $all_rules );
+		
+		// Log for debugging.
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( sprintf(
+				'Custom PWA: Initialized default scenarios for %d post types: %s',
+				count( $post_types ),
+				implode( ', ', $post_types )
+			) );
+		}
+	}
+	
+	/**
+	 * Detect the role/category of a post type to assign appropriate scenarios.
+	 * 
+	 * @param string $post_type The post type name.
+	 * @return string The role key (blog, events, ecommerce, or generic).
+	 */
+	private function detect_post_type_role( $post_type ) {
+		// Map common post type names to roles.
+		$role_map = array(
+			'post'     => 'blog',
+			'page'     => 'generic',
+			'product'  => 'ecommerce',
+			'event'    => 'events',
+			'tribe_events' => 'events',
+			'download' => 'ecommerce',
+			'shop_order' => 'ecommerce',
+		);
+		
+		// Check direct mapping.
+		if ( isset( $role_map[ $post_type ] ) ) {
+			return $role_map[ $post_type ];
+		}
+		
+		// Check for common patterns.
+		if ( strpos( $post_type, 'event' ) !== false ) {
+			return 'events';
+		}
+		
+		if ( strpos( $post_type, 'product' ) !== false || strpos( $post_type, 'shop' ) !== false ) {
+			return 'ecommerce';
+		}
+		
+		if ( strpos( $post_type, 'post' ) !== false || strpos( $post_type, 'article' ) !== false ) {
+			return 'blog';
+		}
+		
+		// Default to generic.
+		return 'generic';
 	}
 
 	/**

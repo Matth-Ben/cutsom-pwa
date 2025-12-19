@@ -37,6 +37,7 @@ class Custom_PWA_Config_Settings {
 	 */
 	public function __construct() {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'admin_init', array( $this, 'handle_vapid_regeneration' ) );
 	}
 
 	/**
@@ -111,6 +112,23 @@ class Custom_PWA_Config_Settings {
 			array( $this, 'render_local_dev_mode_field' ),
 			'custom_pwa_config',
 			'custom_pwa_config_general'
+		);
+
+		// VAPID Keys section.
+		add_settings_section(
+			'custom_pwa_config_vapid',
+			__( 'VAPID Keys', 'custom-pwa' ),
+			array( $this, 'render_vapid_section' ),
+			'custom_pwa_config'
+		);
+
+		// VAPID Keys display.
+		add_settings_field(
+			'vapid_keys',
+			__( 'Push Notification Keys', 'custom-pwa' ),
+			array( $this, 'render_vapid_keys_field' ),
+			'custom_pwa_config',
+			'custom_pwa_config_vapid'
 		);
 
 		/**
@@ -308,6 +326,256 @@ class Custom_PWA_Config_Settings {
 			<?php esc_html_e( '⚠️ Only enable this in local development environments with self-signed SSL certificates. Never use in production!', 'custom-pwa' ); ?>
 		</p>
 		<?php
+	}
+
+	/**
+	 * Render VAPID section description.
+	 */
+	public function render_vapid_section() {
+		?>
+		<p>
+			<?php esc_html_e( 'VAPID (Voluntary Application Server Identification) keys are cryptographic keys used to authenticate your server when sending push notifications.', 'custom-pwa' ); ?>
+		</p>
+		<p>
+			<?php esc_html_e( 'These keys are automatically generated when you activate the plugin. You can regenerate them if needed (this will invalidate all existing subscriptions).', 'custom-pwa' ); ?>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Render VAPID keys field.
+	 */
+	public function render_vapid_keys_field() {
+		$vapid_keys = get_option( 'custom_pwa_push', array() );
+		$public_key = ! empty( $vapid_keys['public_key'] ) ? $vapid_keys['public_key'] : '';
+		$private_key = ! empty( $vapid_keys['private_key'] ) ? $vapid_keys['private_key'] : '';
+
+		// Check if regeneration was successful
+		if ( isset( $_GET['vapid_regenerated'] ) && $_GET['vapid_regenerated'] === 'success' ) {
+			echo '<div class="notice notice-success inline" style="margin: 10px 0;"><p>';
+			echo '<strong>' . esc_html__( '✅ VAPID keys regenerated successfully!', 'custom-pwa' ) . '</strong><br>';
+			echo esc_html__( 'All previous subscriptions have been invalidated. Users will need to resubscribe to receive notifications.', 'custom-pwa' );
+			echo '</p></div>';
+		}
+
+		?>
+		<div style="background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; padding: 15px; margin-bottom: 15px;">
+			<div style="margin-bottom: 15px;">
+				<strong><?php esc_html_e( 'Status:', 'custom-pwa' ); ?></strong>
+				<?php if ( ! empty( $public_key ) && ! empty( $private_key ) ) : ?>
+					<span style="color: #46b450; font-weight: bold;">✅ <?php esc_html_e( 'Keys Generated', 'custom-pwa' ); ?></span>
+				<?php else : ?>
+					<span style="color: #dc3232; font-weight: bold;">❌ <?php esc_html_e( 'Keys Missing', 'custom-pwa' ); ?></span>
+				<?php endif; ?>
+			</div>
+
+			<table class="widefat" style="max-width: 900px; background: white;">
+				<thead>
+					<tr>
+						<th style="width: 150px; padding: 10px;"><?php esc_html_e( 'Key Type', 'custom-pwa' ); ?></th>
+						<th style="padding: 10px;"><?php esc_html_e( 'Value', 'custom-pwa' ); ?></th>
+						<th style="width: 80px; text-align: center; padding: 10px;"><?php esc_html_e( 'Length', 'custom-pwa' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td style="padding: 10px; font-weight: bold;">
+							<?php esc_html_e( 'Public Key', 'custom-pwa' ); ?>
+							<br>
+							<small style="color: #666; font-weight: normal;"><?php esc_html_e( '(Shared with browsers)', 'custom-pwa' ); ?></small>
+						</td>
+						<td style="padding: 10px; font-family: monospace; font-size: 12px; word-break: break-all;">
+							<?php if ( ! empty( $public_key ) ) : ?>
+								<code style="background: #f0f0f0; padding: 5px; display: block;"><?php echo esc_html( $public_key ); ?></code>
+							<?php else : ?>
+								<em style="color: #999;"><?php esc_html_e( 'Not generated', 'custom-pwa' ); ?></em>
+							<?php endif; ?>
+						</td>
+						<td style="padding: 10px; text-align: center;">
+							<?php echo ! empty( $public_key ) ? esc_html( strlen( $public_key ) ) : '—'; ?>
+						</td>
+					</tr>
+					<tr style="background: #f9f9f9;">
+						<td style="padding: 10px; font-weight: bold;">
+							<?php esc_html_e( 'Private Key', 'custom-pwa' ); ?>
+							<br>
+							<small style="color: #666; font-weight: normal;"><?php esc_html_e( '(Keep secret)', 'custom-pwa' ); ?></small>
+						</td>
+						<td style="padding: 10px; font-family: monospace; font-size: 12px; word-break: break-all;">
+							<?php if ( ! empty( $private_key ) ) : ?>
+								<code style="background: #fff3cd; padding: 5px; display: block; border-left: 3px solid #ffc107;">
+									<?php echo esc_html( substr( $private_key, 0, 50 ) . '...' . substr( $private_key, -20 ) ); ?>
+								</code>
+								<small style="color: #856404;">
+									⚠️ <?php esc_html_e( 'Private key truncated for security. Never share this key publicly.', 'custom-pwa' ); ?>
+								</small>
+							<?php else : ?>
+								<em style="color: #999;"><?php esc_html_e( 'Not generated', 'custom-pwa' ); ?></em>
+							<?php endif; ?>
+						</td>
+						<td style="padding: 10px; text-align: center;">
+							<?php echo ! empty( $private_key ) ? esc_html( strlen( $private_key ) ) : '—'; ?>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<div style="margin-top: 15px; padding: 12px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
+				<strong style="color: #856404;">⚠️ <?php esc_html_e( 'Important:', 'custom-pwa' ); ?></strong>
+				<ul style="margin: 8px 0 0 20px; color: #856404;">
+					<li><?php esc_html_e( 'These keys are used to sign push notifications', 'custom-pwa' ); ?></li>
+					<li><?php esc_html_e( 'Generated automatically using OpenSSL (EC P-256 curve)', 'custom-pwa' ); ?></li>
+					<li><?php esc_html_e( 'Regenerating keys will invalidate ALL existing subscriptions', 'custom-pwa' ); ?></li>
+					<li><?php esc_html_e( 'Never share your private key', 'custom-pwa' ); ?></li>
+				</ul>
+			</div>
+		</div>
+
+		<form method="post" action="" style="margin-top: 20px;">
+			<?php wp_nonce_field( 'custom_pwa_regenerate_vapid', 'custom_pwa_vapid_nonce' ); ?>
+			<button 
+				type="submit" 
+				name="custom_pwa_regenerate_vapid" 
+				class="button button-secondary"
+				onclick="return confirm('<?php echo esc_js( __( 'Are you sure you want to regenerate VAPID keys?\n\nThis will:\n• Invalidate all existing subscriptions\n• Users will need to resubscribe\n• Cannot be undone\n\nContinue?', 'custom-pwa' ) ); ?>');"
+			>
+				🔄 <?php esc_html_e( 'Regenerate VAPID Keys', 'custom-pwa' ); ?>
+			</button>
+			<p class="description">
+				<?php esc_html_e( 'Only regenerate if you suspect the keys have been compromised or need to reset all subscriptions.', 'custom-pwa' ); ?>
+			</p>
+		</form>
+
+		<div style="margin-top: 20px; padding: 12px; background: #e7f3ff; border-left: 4px solid #2196f3; border-radius: 4px;">
+			<strong style="color: #0c5c9e;">ℹ️ <?php esc_html_e( 'Technical Details:', 'custom-pwa' ); ?></strong>
+			<ul style="margin: 8px 0 0 20px; color: #0c5c9e;">
+				<li><?php esc_html_e( 'Algorithm: Elliptic Curve P-256 (prime256v1)', 'custom-pwa' ); ?></li>
+				<li><?php esc_html_e( 'Public Key: 65 bytes (uncompressed format, base64url encoded)', 'custom-pwa' ); ?></li>
+				<li><?php esc_html_e( 'Private Key: PEM format (base64url encoded)', 'custom-pwa' ); ?></li>
+				<li><?php esc_html_e( 'Standard: RFC 8292 (VAPID for Web Push)', 'custom-pwa' ); ?></li>
+			</ul>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Handle VAPID key regeneration.
+	 */
+	public function handle_vapid_regeneration() {
+		// Check if regeneration is requested
+		if ( ! isset( $_POST['custom_pwa_regenerate_vapid'] ) ) {
+			return;
+		}
+
+		// Verify nonce
+		if ( ! isset( $_POST['custom_pwa_vapid_nonce'] ) || ! wp_verify_nonce( $_POST['custom_pwa_vapid_nonce'], 'custom_pwa_regenerate_vapid' ) ) {
+			wp_die( esc_html__( 'Security check failed. Please try again.', 'custom-pwa' ) );
+		}
+
+		// Check user permissions
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'custom-pwa' ) );
+		}
+
+		// Generate new VAPID keys
+		$new_keys = $this->generate_vapid_keys();
+
+		if ( empty( $new_keys['public_key'] ) || empty( $new_keys['private_key'] ) ) {
+			wp_die( esc_html__( 'Failed to generate VAPID keys. Please check that OpenSSL is installed and enabled.', 'custom-pwa' ) );
+		}
+
+		// Save new keys
+		update_option( 'custom_pwa_push', $new_keys );
+
+		// Clear all subscriptions (they're now invalid)
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'custom_pwa_subscriptions';
+		$wpdb->query( "TRUNCATE TABLE {$table_name}" );
+
+		// Log the regeneration
+		if ( function_exists( 'error_log' ) ) {
+			error_log( '[Custom PWA] VAPID keys regenerated. All subscriptions cleared.' );
+		}
+
+		// Redirect with success message
+		$redirect_url = add_query_arg(
+			array(
+				'page'             => 'custom-pwa-config',
+				'vapid_regenerated' => 'success',
+			),
+			admin_url( 'admin.php' )
+		);
+		wp_safe_redirect( $redirect_url );
+		exit;
+	}
+
+	/**
+	 * Generate VAPID keys for Web Push.
+	 * 
+	 * @return array Array with 'public_key' and 'private_key'.
+	 */
+	private function generate_vapid_keys() {
+		// Check if OpenSSL is available.
+		if ( ! function_exists( 'openssl_pkey_new' ) ) {
+			error_log( 'Custom PWA: OpenSSL is not available. Cannot generate VAPID keys.' );
+			return array(
+				'public_key'  => '',
+				'private_key' => '',
+			);
+		}
+
+		// Generate EC key pair (prime256v1 curve, which is P-256).
+		$config = array(
+			'private_key_type' => OPENSSL_KEYTYPE_EC,
+			'curve_name'       => 'prime256v1',
+		);
+
+		$key_resource = openssl_pkey_new( $config );
+		if ( ! $key_resource ) {
+			error_log( 'Custom PWA: Failed to generate VAPID key pair.' );
+			return array(
+				'public_key'  => '',
+				'private_key' => '',
+			);
+		}
+
+		// Export private key in PEM format.
+		$private_key_pem = '';
+		openssl_pkey_export( $key_resource, $private_key_pem );
+
+		// Get public key details and extract raw EC point.
+		$key_details = openssl_pkey_get_details( $key_resource );
+		$ec_key      = $key_details['ec'];
+		
+		// Extract X and Y coordinates (32 bytes each for P-256).
+		$x = $ec_key['x'];
+		$y = $ec_key['y'];
+		
+		// Pad to 32 bytes if needed.
+		$x = str_pad( $x, 32, "\0", STR_PAD_LEFT );
+		$y = str_pad( $y, 32, "\0", STR_PAD_LEFT );
+		
+		// Create uncompressed public key: 0x04 + X (32 bytes) + Y (32 bytes) = 65 bytes.
+		$public_key_raw = "\x04" . $x . $y;
+		
+		// Base64url encode both keys.
+		$public_key_base64url  = $this->base64url_encode( $public_key_raw );
+		$private_key_base64url = $this->base64url_encode( $private_key_pem );
+
+		return array(
+			'public_key'  => $public_key_base64url,
+			'private_key' => $private_key_base64url,
+		);
+	}
+
+	/**
+	 * Base64url encode.
+	 *
+	 * @param string $data Data to encode.
+	 * @return string Base64url encoded string.
+	 */
+	private function base64url_encode( $data ) {
+		return rtrim( strtr( base64_encode( $data ), '+/', '-_' ), '=' );
 	}
 
 	/**

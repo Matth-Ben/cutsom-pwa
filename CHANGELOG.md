@@ -2,9 +2,87 @@
 
 All notable changes to the Custom PWA plugin will be documented in this file.
 
+## [1.0.5] - 2025-12-19
+
+### Added
+- **VAPID Key Management**: New section in Config page for managing push notification keys
+  - **Visual key display**: Shows public and private VAPID keys with lengths
+  - **Status indicator**: ✅/❌ showing if keys are properly generated
+  - **Security features**:
+    - Private key truncated in display for security
+    - Warning labels for sensitive information
+    - Confirmation dialog before regeneration
+  - **Regenerate button**: Manual key regeneration with one click
+    - Generates new EC P-256 key pair using OpenSSL
+    - Automatically clears all subscriptions (they become invalid with new keys)
+    - Shows success message after regeneration
+    - Logs operation to debug.log
+  - **Technical information panel**: Shows algorithm details (P-256, RFC 8292)
+  - **Important warnings**: Clear explanations about key regeneration impacts
+  - **Use cases explained**: When to regenerate (compromised keys, reset, testing)
+
+### Changed
+- **Config Settings class**: Enhanced with VAPID management functionality
+  - Added `render_vapid_section()` method for section description
+  - Added `render_vapid_keys_field()` method for key display and management UI
+  - Added `handle_vapid_regeneration()` method for processing regeneration requests
+  - Added `generate_vapid_keys()` private method for key generation
+  - Added `base64url_encode()` helper method
+  - Added nonce verification for security
+  - Added admin capability check (manage_options)
+
+### Documentation
+- **PUSH-REQUIREMENTS.md**: New comprehensive documentation about push notification requirements
+  - Clarifies that mkcert is NOT used for push notifications (only for local HTTPS)
+  - Explains VAPID (Web Push Protocol RFC 8292)
+  - Details all PHP extensions needed (openssl, curl, json, mbstring)
+  - Documents OpenSSL P-256 curve usage
+  - Provides verification commands and checklist
+  - Production deployment checklist
+- **test-vapid-management.php**: New test script to verify VAPID functionality
+  - Tests current keys display
+  - Tests new key generation
+  - Tests uniqueness verification
+  - Tests OpenSSL capabilities
+  - Shows admin access instructions
+
 ## [1.0.4] - 2025-12-18
 
 ### Added
+- **Automatic File Installation**: Required files copied to site root on activation
+  - **Service Worker**: `sw.js` automatically copied from `assets/examples/sw-example.js`
+  - **Offline Page**: `offline.html` automatically copied from `assets/examples/offline-example.html`
+  - **Smart copy logic**:
+    - Files only copied if they don't exist (no overwrite)
+    - Automatic chmod 644 for proper permissions
+    - Error tracking if copy fails
+    - Status saved in `custom_pwa_file_copy_status` option
+  - **No manual FTP/SSH needed**: Users don't need server access anymore!
+- **Installation Page**: New admin page "Custom PWA → Installation"
+  - **Real-time status table**: Shows which files are installed (✅/❌)
+  - **Automatic copy results**: Displays copied files and any errors
+  - **File locations**: Shows exact paths and URLs for each file
+  - **Manual installation guide**: Complete step-by-step instructions if automatic copy fails
+  - **FTP instructions**: How to manually copy files via FTP/File Manager
+  - **SSH commands**: Ready-to-use terminal commands for SSH users
+  - **Troubleshooting section**: Solutions for common issues (permissions, HTTPS, etc.)
+  - **Documentation links**: Quick access to all guides and configuration pages
+  - **Refresh button**: Re-check installation status after manual changes
+- **Automatic Plugin Initialization**: Complete setup on first activation
+  - **Default scenarios initialization**: All public post types automatically configured with appropriate scenarios
+  - **Intelligent role detection**: Post types mapped to roles (blog, events, ecommerce, generic)
+    - `post` → Blog scenarios (publication, major_update, featured)
+    - `product` → E-commerce scenarios (price_drop, back_in_stock, out_of_stock, etc.)
+    - `event`, `tribe_events` → Events scenarios (sales_open, sold_out, cancelled, rescheduled)
+    - Other types → Generic scenarios (publication, major_update, status_change)
+  - **Safe defaults**: All scenarios disabled by default, admin must explicitly enable
+  - **Field values pre-filled**: Meta keys and other field defaults automatically set
+  - **Database options created**:
+    - `custom_pwa_push_rules`: Post type rules with scenarios structure
+    - `custom_pwa_custom_scenarios`: Empty array ready for custom scenarios
+    - `custom_pwa_push`: VAPID keys for Web Push
+  - **Table creation**: `wp_custom_pwa_subscriptions` table automatically created
+  - **No manual setup required**: Plugin ready to use immediately after activation
 - **Meta Key Selector in Scenarios**: Intelligent UI for configuring meta field triggers
   - **Dropdown selection**: Choose from real database meta keys instead of typing manually
   - **Three optgroups**:
@@ -71,6 +149,15 @@ All notable changes to the Custom PWA plugin will be documented in this file.
   - Real-world use cases (blog, e-commerce, events, news)
 
 ### Fixed
+- **Manifest 404 Error**: Fixed manifest.webmanifest returning 404 immediately after activation
+  - **Root cause**: `flush_rewrite_rules()` was called during activation before rewrite rules were registered
+  - **Solution**: Implemented deferred flush using transient `custom_pwa_flush_rewrite_rules`
+  - **How it works**: 
+    - Activation sets transient flag instead of immediate flush
+    - New `maybe_flush_rewrite_rules()` method checks transient on `init` hook
+    - Flush happens AFTER all rewrite rules are properly registered
+    - Manifest now accessible immediately on first page load after activation
+  - **No manual intervention needed**: Users don't need to visit Settings → Permalinks anymore
 - **Page Load Error**: Fixed "Impossible de charger custom-pwa-push" fatal error
   - Changed URL parameter from `post_type=` to `cpt=` to avoid WordPress conflicts
   - WordPress reserves `post_type` parameter for its core post type management

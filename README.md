@@ -28,15 +28,45 @@ A comprehensive WordPress plugin for implementing Progressive Web App (PWA) feat
 
 ## Requirements
 
-- PHP 8.0 or higher
-- WordPress 6.0 or higher
-- HTTPS (required for service workers and push notifications)
+### Server Requirements
+- **PHP 8.0 or higher**
+- **WordPress 6.0 or higher**
+- **HTTPS** (required for service workers and push notifications)
+
+### PHP Extensions (Standard - Usually Pre-installed)
+- ✅ `openssl` - VAPID key generation (EC P-256)
+- ✅ `curl` - Push notification delivery
+- ✅ `json` - Payload encoding
+- ✅ `mbstring` - Binary data handling
+
+> **Note**: These extensions are included in standard PHP installations. No external tools (like mkcert) are needed for push notifications. See [PUSH-REQUIREMENTS.md](PUSH-REQUIREMENTS.md) for details.
 
 ## Installation
 
 1. Download or clone this repository to `/wp-content/plugins/custom-pwa/`
 2. Activate the plugin through the WordPress admin panel
-3. Navigate to **Custom PWA** in the admin sidebar
+3. **That's it!** The plugin automatically sets up everything you need:
+   - ✅ Creates database table for subscriptions
+   - ✅ Generates VAPID keys for Web Push
+   - ✅ Initializes notification scenarios for all post types
+   - ✅ Configures default settings
+   - ✅ All features are disabled by default for security
+
+### What happens on activation?
+
+The plugin performs a **complete automatic setup**:
+
+- **Database**: Creates `wp_custom_pwa_subscriptions` table
+- **VAPID Keys**: Generates cryptographic key pair for Web Push
+- **Scenarios**: Configures notification scenarios for all public post types
+  - Blog/Articles: publication, major_update, featured
+  - E-commerce: price_drop, back_in_stock, sold_out, etc.
+  - Events: sales_open, cancelled, rescheduled, etc.
+  - Generic: publication, major_update, status_change
+- **Options**: Creates all WordPress options with safe defaults
+- **Security**: Everything disabled by default, you activate what you need
+
+📖 **Detailed installation guide**: See [INSTALLATION.md](INSTALLATION.md)
 
 ## Quick Start
 
@@ -329,7 +359,7 @@ Developed with ❤️ for the WordPress community.
 
 ---
 
-**Version:** 1.0.0  
+**Version:** 1.0.5  
 **Requires PHP:** 8.0+  
 **Requires WordPress:** 6.0+  
 **Tested up to:** 6.4  

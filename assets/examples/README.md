@@ -283,5 +283,5 @@ For issues and feature requests, please contact the plugin developer or refer to
 
 ---
 
-**Version:** 1.0.0  
+**Version:** 1.0.5  
 **Last Updated:** December 2025

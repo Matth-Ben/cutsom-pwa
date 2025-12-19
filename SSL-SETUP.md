@@ -259,7 +259,7 @@ sudo systemctl restart php8.3-fpm
 
 ### Still Getting Errors?
 
-1. **Verify plugin version:** 1.0.3 or higher
+1. **Verify plugin version:** 1.0.5 or higher
 2. **Check SSL Helper page:** Custom PWA → 🔒 SSL Helper
 3. **Enable Debug Mode:** Custom PWA → Config → Debug Mode
 4. **View logs:**
