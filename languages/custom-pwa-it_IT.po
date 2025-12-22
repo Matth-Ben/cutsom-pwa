@@ -1,0 +1,1938 @@
+# Copyright (C) 2025 Your Name
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Custom PWA 1.0.5\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/cutsom-pwa\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Italiano\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-12-22T14:17:27+00:00\n"
+"PO-Revision-Date: 2024-12-22 12:00+0000\n"
+"X-Generator: WP-CLI 2.8.1\n"
+"X-Domain: custom-pwa\n"
+
+#. Plugin Name of the plugin
+#: custom-pwa.php:183
+#: includes/class-admin-menu.php:69
+#: includes/class-admin-menu.php:70
+msgid "Custom PWA"
+msgstr "Custom PWA"
+
+#. Plugin URI of the plugin
+msgid "https://example.com/custom-pwa"
+msgstr "https://example.com/custom-pwa"
+
+#. Description of the plugin
+msgid "Complete PWA configuration and Web Push notifications plugin for WordPress. Supports manifest generation, service worker examples, and push notifications for all post types including custom post types."
+msgstr "Plugin WordPress per la configurazione completa della PWA e le notifiche Web Push. Supporta la generazione del manifest, esempi di Service Worker e notifiche push per tutti i tipi di contenuto, inclusi i tipi di contenuto personalizzati."
+
+#. Author of the plugin
+msgid "Your Name"
+msgstr "Il tuo nome"
+
+#. Author URI of the plugin
+msgid "https://example.com"
+msgstr "https://example.com"
+
+#: custom-pwa.php:184
+msgid "Plugin activated successfully! All files have been installed and the manifest endpoint is ready."
+msgstr "Plugin attivato con successo! Tutti i file sono stati installati e l'endpoint del manifest è pronto."
+
+#: includes/class-admin-menu.php:81
+#: includes/class-admin-menu.php:158
+msgid "PWA Settings"
+msgstr "Impostazioni PWA"
+
+#: includes/class-admin-menu.php:82
+msgid "PWA"
+msgstr "PWA"
+
+#: includes/class-admin-menu.php:91
+msgid "Push Notifications"
+msgstr "Notifiche Push"
+
+#: includes/class-admin-menu.php:92
+msgid "Push"
+msgstr "Push"
+
+#: includes/class-admin-menu.php:101
+#: includes/class-admin-menu.php:396
+msgid "Global Configuration"
+msgstr "Configurazione globale"
+
+#: includes/class-admin-menu.php:102
+msgid "Config"
+msgstr "Configurazione"
+
+#: includes/class-admin-menu.php:111
+#: includes/class-admin-menu.php:439
+msgid "Installation Guide"
+msgstr "Guida all'installazione"
+
+#: includes/class-admin-menu.php:112
+msgid "Installation"
+msgstr "Installazione"
+
+#: includes/class-admin-menu.php:154
+#: includes/class-admin-menu.php:179
+#: includes/class-admin-menu.php:392
+#: includes/class-admin-menu.php:406
+#: includes/class-scenario-handlers.php:29
+msgid "You do not have sufficient permissions to access this page."
+msgstr "Non hai permessi sufficienti per accedere a questa pagina."
+
+#: includes/class-admin-menu.php:164
+msgid "PWA features are currently disabled. Please enable them in the Config page."
+msgstr "Le funzionalità PWA sono attualmente disabilitate. Abilítale nella pagina Config."
+
+#: includes/class-admin-menu.php:166
+#: includes/class-admin-menu.php:195
+msgid "Go to Config"
+msgstr "Vai a Config"
+
+#: includes/class-admin-menu.php:193
+msgid "Web Push notifications are currently disabled. Please enable them in the Config page."
+msgstr "Le notifiche Web Push sono attualmente disabilitate. Abilítale nella pagina Config."
+
+#: includes/class-admin-menu.php:204
+msgid "Notification Templates"
+msgstr "Template di notifica"
+
+#: includes/class-admin-menu.php:205
+msgid "Configure push notification scenarios and templates for each post type."
+msgstr "Configura scenari e template di notifica push per ogni tipo di contenuto."
+
+#: includes/class-admin-menu.php:211
+msgid "Post Type Configuration"
+msgstr "Configurazione dei tipi di contenuto"
+
+#: includes/class-admin-menu.php:216
+msgid "Manage Scenarios"
+msgstr "Gestisci scenari"
+
+#: includes/class-admin-menu.php:238
+#: includes/class-push-settings.php:60
+msgid "Push Notification Rules"
+msgstr "Regole di notifica push"
+
+#: includes/class-admin-menu.php:239
+msgid "Configure notification scenarios based on the role assigned to each post type."
+msgstr "Configura scenari di notifica in base al ruolo assegnato a ciascun tipo di contenuto."
+
+#: includes/class-admin-menu.php:246
+msgid "Available placeholders: "
+msgstr ""
+
+#: includes/class-admin-menu.php:337
+msgid "Post Types"
+msgstr "Tipi di contenuto"
+
+#: includes/class-admin-menu.php:341
+msgid "No post types enabled."
+msgstr "Nessun tipo di contenuto abilitato."
+
+#: includes/class-admin-menu.php:343
+msgid "Configure"
+msgstr "Configura"
+
+#: includes/class-admin-menu.php:370
+msgid "Test"
+msgstr "Testa"
+
+#: includes/class-admin-menu.php:380
+msgid "Click on a post type to configure its notification template."
+msgstr "Clicca su un tipo di contenuto per configurare il suo template di notifica."
+
+#: includes/class-admin-menu.php:443
+msgid "✅ Automatic Installation Status"
+msgstr "✅ Stato installazione automatica"
+
+#: includes/class-admin-menu.php:446
+msgid "Last installation attempt:"
+msgstr "Ultimo tentativo di installazione:"
+
+#: includes/class-admin-menu.php:451
+msgid "Required Files Status:"
+msgstr "Stato dei file richiesti:"
+
+#: includes/class-admin-menu.php:455
+msgid "File"
+msgstr "File"
+
+#: includes/class-admin-menu.php:456
+msgid "Status"
+msgstr "Stato"
+
+#: includes/class-admin-menu.php:457
+msgid "Location"
+msgstr "Percorso"
+
+#: includes/class-admin-menu.php:458
+#: includes/class-scenario-manager-ui.php:156
+msgid "Actions"
+msgstr "Azioni"
+
+#: includes/class-admin-menu.php:467
+#: includes/class-ssl-helper.php:265
+msgid "Installed"
+msgstr "Installato"
+
+#: includes/class-admin-menu.php:469
+msgid "Missing"
+msgstr "Mancante"
+
+#: includes/class-admin-menu.php:476
+msgid "View File"
+msgstr "Visualizza file"
+
+#: includes/class-admin-menu.php:479
+msgid "Not installed"
+msgstr "Non installato"
+
+#: includes/class-admin-menu.php:489
+msgid "Installation Errors:"
+msgstr "Errori di installazione:"
+
+#: includes/class-admin-menu.php:501
+msgid "Some files are missing!"
+msgstr "Mancano alcuni file!"
+
+#: includes/class-admin-menu.php:502
+msgid "The automatic installation failed. Please follow the manual installation steps below."
+msgstr "L'installazione automatica non è riuscita. Segui i passaggi di installazione manuale qui sotto."
+
+#: includes/class-admin-menu.php:508
+msgid "✅ All required files are installed!"
+msgstr "✅ Tutti i file richiesti sono installati!"
+
+#: includes/class-admin-menu.php:509
+msgid "Your PWA is ready to use. Enable it in the Config page."
+msgstr "La tua PWA è pronta all'uso. Abilítala nella pagina Config."
+
+#: includes/class-admin-menu.php:517
+msgid "📖 Manual Installation (if automatic failed)"
+msgstr "📖 Installazione manuale (se l'automatica non è riuscita)"
+
+#: includes/class-admin-menu.php:519
+msgid "If the automatic installation failed, follow these steps to manually install the required files:"
+msgstr "Se l'installazione automatica non è riuscita, segui questi passaggi per installare manualmente i file richiesti:"
+
+#: includes/class-admin-menu.php:521
+msgid "Step 1: Locate the example files"
+msgstr "Passo 1: Individua i file di esempio"
+
+#: includes/class-admin-menu.php:522
+msgid "The example files are located in the plugin directory:"
+msgstr "I file di esempio si trovano nella directory del plugin:"
+
+#: includes/class-admin-menu.php:525
+msgid "Step 2: Copy files to your site root"
+msgstr "Passo 2: Copia i file nella root del sito"
+
+#: includes/class-admin-menu.php:526
+msgid "You need to copy these files to the root of your WordPress installation:"
+msgstr "Devi copiare questi file nella root della tua installazione WordPress:"
+
+#: includes/class-admin-menu.php:531
+msgid "Source File"
+msgstr "File sorgente"
+
+#: includes/class-admin-menu.php:532
+msgid "Destination"
+msgstr "Destinazione"
+
+#: includes/class-admin-menu.php:547
+msgid "Step 3: Via FTP/File Manager"
+msgstr "Passo 3: Tramite FTP/File Manager"
+
+#: includes/class-admin-menu.php:549
+msgid "Connect to your server via FTP or use your hosting file manager"
+msgstr "Connettiti al server tramite FTP o usa il file manager del tuo hosting"
+
+#: includes/class-admin-menu.php:550
+msgid "Navigate to:"
+msgstr "Vai a:"
+
+#: includes/class-admin-menu.php:551
+msgid "Download"
+msgstr "Scarica"
+
+#: includes/class-admin-menu.php:551
+msgid "and"
+msgstr "e"
+
+#: includes/class-admin-menu.php:552
+msgid "Navigate to your site root:"
+msgstr "Vai alla root del sito:"
+
+#: includes/class-admin-menu.php:553
+msgid "Upload and rename:"
+msgstr "Carica e rinomina:"
+
+#: includes/class-admin-menu.php:559
+msgid "Set file permissions to 644"
+msgstr "Imposta i permessi del file a 644"
+
+#: includes/class-admin-menu.php:562
+msgid "Step 4: Via SSH/Terminal"
+msgstr "Passo 4: Tramite SSH/Terminale"
+
+#: includes/class-admin-menu.php:563
+msgid "If you have SSH access, run these commands:"
+msgstr "Se hai accesso SSH, esegui questi comandi:"
+
+#: includes/class-admin-menu.php:571
+msgid "Step 5: Verify Installation"
+msgstr "Passo 5: Verifica l'installazione"
+
+#: includes/class-admin-menu.php:572
+msgid "After copying the files, refresh this page to verify the installation status."
+msgstr "Dopo aver copiato i file, aggiorna questa pagina per verificare lo stato dell'installazione."
+
+#: includes/class-admin-menu.php:575
+#: includes/class-ssl-helper.php:350
+msgid "Refresh Status"
+msgstr "Aggiorna stato"
+
+#: includes/class-admin-menu.php:582
+msgid "🔧 Troubleshooting"
+msgstr "🔧 Risoluzione dei problemi"
+
+#: includes/class-admin-menu.php:584
+msgid "Common Issues:"
+msgstr "Problemi comuni:"
+
+#: includes/class-admin-menu.php:586
+msgid "Permission Denied Error"
+msgstr "Errore: permesso negato"
+
+#: includes/class-admin-menu.php:587
+msgid "If you see \"Failed to copy\" errors, your server doesn't allow PHP to write files. Solutions:"
+msgstr "Se vedi errori \"Failed to copy\", il tuo server non consente a PHP di scrivere file. Soluzioni:"
+
+#: includes/class-admin-menu.php:589
+msgid "Contact your hosting provider to adjust file permissions"
+msgstr "Contatta il tuo provider di hosting per regolare i permessi dei file"
+
+#: includes/class-admin-menu.php:590
+msgid "Use FTP/File Manager to copy files manually (see above)"
+msgstr "Usa FTP/File Manager per copiare i file manualmente (vedi sopra)"
+
+#: includes/class-admin-menu.php:591
+msgid "Ask your hosting to enable write permissions for:"
+msgstr "Chiedi al tuo hosting di abilitare i permessi di scrittura per:"
+
+#: includes/class-admin-menu.php:594
+msgid "Service Worker Not Loading"
+msgstr "Il Service Worker non si carica"
+
+#: includes/class-admin-menu.php:595
+msgid "Service workers require HTTPS. Check:"
+msgstr "I Service Worker richiedono HTTPS. Verifica:"
+
+#: includes/class-admin-menu.php:597
+msgid "Your site is accessible via HTTPS"
+msgstr "Il tuo sito è accessibile via HTTPS"
+
+#: includes/class-admin-menu.php:598
+msgid "No mixed content warnings in browser console"
+msgstr "Nessun avviso di contenuto misto nella console del browser"
+
+#: includes/class-admin-menu.php:599
+msgid "The sw.js file is accessible at:"
+msgstr "Il file sw.js è accessibile a:"
+
+#: includes/class-admin-menu.php:602
+msgid "Files Disappear After Update"
+msgstr "I file scompaiono dopo un aggiornamento"
+
+#: includes/class-admin-menu.php:603
+msgid "Some hosting providers clean the site root during updates. If this happens:"
+msgstr "Alcuni provider di hosting puliscono la root del sito durante gli aggiornamenti. Se succede:"
+
+#: includes/class-admin-menu.php:605
+msgid "Deactivate and reactivate the plugin to trigger automatic installation"
+msgstr "Disattiva e riattiva il plugin per avviare l'installazione automatica"
+
+#: includes/class-admin-menu.php:606
+msgid "Or copy the files manually again"
+msgstr "Oppure copia di nuovo i file manualmente"
+
+#: includes/class-admin-menu.php:612
+msgid "📚 Additional Resources"
+msgstr "📚 Risorse aggiuntive"
+
+#: includes/class-admin-menu.php:614
+msgid "Complete Installation Guide"
+msgstr "Guida completa all'installazione"
+
+#: includes/class-admin-menu.php:615
+msgid "Scenarios Usage Guide"
+msgstr "Guida all'uso degli scenari"
+
+#: includes/class-admin-menu.php:616
+msgid "Changelog"
+msgstr "Registro modifiche"
+
+#: includes/class-admin-menu.php:617
+msgid "Go to Configuration"
+msgstr "Vai alla Configurazione"
+
+#: includes/class-config-settings.php:58
+msgid "General Settings"
+msgstr "Impostazioni generali"
+
+#: includes/class-config-settings.php:66
+msgid "Enable PWA Features"
+msgstr "Abilita funzionalità PWA"
+
+#: includes/class-config-settings.php:75
+msgid "Enable Web Push Notifications"
+msgstr "Abilita notifiche Web Push"
+
+#: includes/class-config-settings.php:84
+msgid "Site Type"
+msgstr "Tipo di sito"
+
+#: includes/class-config-settings.php:93
+msgid "Post Types for Web Push"
+msgstr "Tipi di contenuto per Web Push"
+
+#: includes/class-config-settings.php:102
+msgid "Enable Debug Mode"
+msgstr "Abilita modalità debug"
+
+#: includes/class-config-settings.php:111
+msgid "Local Development Mode"
+msgstr "Modalità sviluppo locale"
+
+#: includes/class-config-settings.php:120
+msgid "VAPID Keys"
+msgstr "Chiavi VAPID"
+
+#: includes/class-config-settings.php:128
+msgid "Push Notification Keys"
+msgstr "Chiavi delle notifiche push"
+
+#: includes/class-config-settings.php:165
+msgid "Configure global settings for the Custom PWA plugin."
+msgstr "Configura le impostazioni globali del plugin Custom PWA."
+
+#: includes/class-config-settings.php:177
+msgid "Enable PWA features (manifest, icons, meta tags)"
+msgstr "Abilita le funzionalità PWA (manifest, icone, meta tag)"
+
+#: includes/class-config-settings.php:191
+msgid "Enable Web Push notifications for post types"
+msgstr "Abilita notifiche Web Push per i tipi di contenuto"
+
+#: includes/class-config-settings.php:204
+#: includes/class-push-settings.php:197
+msgid "Generic"
+msgstr "Generico"
+
+#: includes/class-config-settings.php:205
+msgid "E-commerce"
+msgstr "Commercio elettronico"
+
+#: includes/class-config-settings.php:206
+msgid "Events (Concerts)"
+msgstr "Eventi (concerti)"
+
+#: includes/class-config-settings.php:207
+#: includes/class-push-settings.php:318
+#: includes/class-push-settings.php:498
+msgid "Custom"
+msgstr "Personalizzato"
+
+#: includes/class-config-settings.php:227
+msgid "Select the type of site to customize push notification templates and placeholders."
+msgstr "Seleziona il tipo di sito per personalizzare template e segnaposto delle notifiche push."
+
+#: includes/class-config-settings.php:248
+msgid "No public post types found."
+msgstr "Nessun tipo di contenuto pubblico trovato."
+
+#: includes/class-config-settings.php:257
+msgid "Select post types and assign roles to customize push notification scenarios."
+msgstr "Seleziona i tipi di contenuto e assegna ruoli per personalizzare gli scenari di notifica push."
+
+#: includes/class-config-settings.php:261
+msgid "Enable"
+msgstr "Attiva"
+
+#: includes/class-config-settings.php:262
+#: includes/class-custom-scenarios.php:377
+msgid "Post Type"
+msgstr "Tipo di contenuto"
+
+#: includes/class-config-settings.php:263
+msgid "Role"
+msgstr "Ruolo"
+
+#: includes/class-config-settings.php:295
+msgid "Select post types that will trigger Web Push notifications when published."
+msgstr "Seleziona i tipi di contenuto che attiveranno notifiche Web Push quando pubblicati."
+
+#: includes/class-config-settings.php:309
+msgid "Enable verbose logging for debugging purposes"
+msgstr "Abilita log dettagliati per scopi di debug"
+
+#: includes/class-config-settings.php:323
+msgid "Bypass SSL certificate checks for Service Worker (localhost/development only)"
+msgstr "Ignora i controlli del certificato SSL per il Service Worker (solo localhost/sviluppo)"
+
+#: includes/class-config-settings.php:326
+msgid "⚠️ Only enable this in local development environments with self-signed SSL certificates. Never use in production!"
+msgstr "⚠️ Abilita questa opzione solo in ambienti di sviluppo locale con certificati SSL autofirmati. Non usarla mai in produzione!"
+
+#: includes/class-config-settings.php:337
+msgid "VAPID (Voluntary Application Server Identification) keys are cryptographic keys used to authenticate your server when sending push notifications."
+msgstr "Le chiavi VAPID (Voluntary Application Server Identification) sono chiavi crittografiche usate per autenticare il tuo server quando invii notifiche push."
+
+#: includes/class-config-settings.php:340
+msgid "These keys are automatically generated when you activate the plugin. You can regenerate them if needed (this will invalidate all existing subscriptions)."
+msgstr "Queste chiavi vengono generate automaticamente quando attivi il plugin. Puoi rigenerarle se necessario (questo invaliderà tutte le sottoscrizioni esistenti)."
+
+#: includes/class-config-settings.php:356
+msgid "✅ VAPID keys regenerated successfully!"
+msgstr "✅ Chiavi VAPID rigenerate con successo!"
+
+#: includes/class-config-settings.php:357
+msgid "All previous subscriptions have been invalidated. Users will need to resubscribe to receive notifications."
+msgstr "Tutte le sottoscrizioni precedenti sono state invalidate. Gli utenti dovranno iscriversi di nuovo per ricevere notifiche."
+
+#: includes/class-config-settings.php:364
+msgid "Status:"
+msgstr "Stato:"
+
+#: includes/class-config-settings.php:366
+msgid "Keys Generated"
+msgstr "Chiavi generate"
+
+#: includes/class-config-settings.php:368
+msgid "Keys Missing"
+msgstr "Chiavi mancanti"
+
+#: includes/class-config-settings.php:375
+msgid "Key Type"
+msgstr "Tipo di chiave"
+
+#: includes/class-config-settings.php:376
+msgid "Value"
+msgstr "Valore"
+
+#: includes/class-config-settings.php:377
+msgid "Length"
+msgstr "Lunghezza"
+
+#: includes/class-config-settings.php:383
+msgid "Public Key"
+msgstr "Chiave pubblica"
+
+#: includes/class-config-settings.php:385
+msgid "(Shared with browsers)"
+msgstr "(Condivisa con i browser)"
+
+#: includes/class-config-settings.php:391
+#: includes/class-config-settings.php:413
+msgid "Not generated"
+msgstr "Non generata"
+
+#: includes/class-config-settings.php:400
+msgid "Private Key"
+msgstr "Chiave privata"
+
+#: includes/class-config-settings.php:402
+msgid "(Keep secret)"
+msgstr "(Mantieni segreta)"
+
+#: includes/class-config-settings.php:410
+msgid "Private key truncated for security. Never share this key publicly."
+msgstr "Chiave privata troncata per sicurezza. Non condividere mai questa chiave pubblicamente."
+
+#: includes/class-config-settings.php:424
+msgid "Important:"
+msgstr "Importante:"
+
+#: includes/class-config-settings.php:426
+msgid "These keys are used to sign push notifications"
+msgstr "Queste chiavi sono usate per firmare le notifiche push"
+
+#: includes/class-config-settings.php:427
+msgid "Generated automatically using OpenSSL (EC P-256 curve)"
+msgstr "Generate automaticamente usando OpenSSL (curva EC P-256)"
+
+#: includes/class-config-settings.php:428
+msgid "Regenerating keys will invalidate ALL existing subscriptions"
+msgstr "Rigenerare le chiavi invaliderà TUTTE le sottoscrizioni esistenti"
+
+#: includes/class-config-settings.php:429
+msgid "Never share your private key"
+msgstr "Non condividere mai la tua chiave privata"
+
+#: includes/class-config-settings.php:440
+msgid "Are you sure you want to regenerate VAPID keys?\\n\\nThis will:\\n• Invalidate all existing subscriptions\\n• Users will need to resubscribe\\n• Cannot be undone\\n\\nContinue?"
+msgstr "Sei sicuro di voler rigenerare le chiavi VAPID?\n\nQuesto farà quanto segue:\n• Invaliderà tutte le sottoscrizioni esistenti\n• Gli utenti dovranno iscriversi di nuovo\n• Non può essere annullato\n\nContinuare?"
+
+#: includes/class-config-settings.php:442
+msgid "Regenerate VAPID Keys"
+msgstr "Rigenera chiavi VAPID"
+
+#: includes/class-config-settings.php:445
+msgid "Only regenerate if you suspect the keys have been compromised or need to reset all subscriptions."
+msgstr "Rigenera solo se sospetti che le chiavi siano state compromesse o se devi reimpostare tutte le sottoscrizioni."
+
+#: includes/class-config-settings.php:450
+msgid "Technical Details:"
+msgstr "Dettagli tecnici:"
+
+#: includes/class-config-settings.php:452
+msgid "Algorithm: Elliptic Curve P-256 (prime256v1)"
+msgstr "Algoritmo: curva ellittica P-256 (prime256v1)"
+
+#: includes/class-config-settings.php:453
+msgid "Public Key: 65 bytes (uncompressed format, base64url encoded)"
+msgstr "Chiave pubblica: 65 byte (formato non compresso, codificata in base64url)"
+
+#: includes/class-config-settings.php:454
+msgid "Private Key: PEM format (base64url encoded)"
+msgstr "Chiave privata: formato PEM (codificata in base64url)"
+
+#: includes/class-config-settings.php:455
+msgid "Standard: RFC 8292 (VAPID for Web Push)"
+msgstr "Standard: RFC 8292 (VAPID per Web Push)"
+
+#: includes/class-config-settings.php:472
+msgid "Security check failed. Please try again."
+msgstr "Controllo di sicurezza non riuscito. Riprova."
+
+#: includes/class-config-settings.php:477
+msgid "You do not have permission to perform this action."
+msgstr "Non hai il permesso di eseguire questa azione."
+
+#: includes/class-config-settings.php:484
+msgid "Failed to generate VAPID keys. Please check that OpenSSL is installed and enabled."
+msgstr "Impossibile generare le chiavi VAPID. Verifica che OpenSSL sia installato e abilitato."
+
+#: includes/class-custom-scenarios.php:187
+#: includes/class-scenario-manager-ui.php:242
+msgid "Scenario not found."
+msgstr "Scenario non trovato."
+
+#: includes/class-custom-scenarios.php:264
+msgid "Scenario ID is required."
+msgstr "È richiesto l'ID dello scenario."
+
+#: includes/class-custom-scenarios.php:270
+msgid "Scenario label is required."
+msgstr "È richiesta l'etichetta dello scenario."
+
+#: includes/class-custom-scenarios.php:280
+msgid "Scenario scope must be \"global\" or \"post_type\"."
+msgstr "L'ambito dello scenario deve essere \"global\" o \"post_type\"."
+
+#: includes/class-custom-scenarios.php:287
+msgid "Post types are required for post-type-specific scenarios."
+msgstr "Sono richiesti i tipi di contenuto per scenari specifici per tipo."
+
+#: includes/class-custom-scenarios.php:348
+msgid "On Publish (new post)"
+msgstr "Alla pubblicazione (nuovo contenuto)"
+
+#: includes/class-custom-scenarios.php:349
+msgid "On Update (existing post edited)"
+msgstr "All'aggiornamento (contenuto esistente modificato)"
+
+#: includes/class-custom-scenarios.php:350
+msgid "On Meta Field Change"
+msgstr "Alla modifica di un campo meta"
+
+#: includes/class-custom-scenarios.php:351
+msgid "On Status Change"
+msgstr "Alla modifica dello stato"
+
+#: includes/class-custom-scenarios.php:371
+msgid "Post Title"
+msgstr "Titolo del contenuto"
+
+#: includes/class-custom-scenarios.php:372
+msgid "Post Content"
+msgstr "Contenuto del post"
+
+#: includes/class-custom-scenarios.php:373
+msgid "Post Excerpt"
+msgstr "Estratto del post"
+
+#: includes/class-custom-scenarios.php:374
+msgid "Post Status"
+msgstr "Stato del post"
+
+#: includes/class-custom-scenarios.php:375
+msgid "Post Date"
+msgstr "Data del post"
+
+#: includes/class-custom-scenarios.php:376
+msgid "Post Author"
+msgstr "Autore del post"
+
+#: includes/class-dispatcher.php:368
+msgid "TBA"
+msgstr "TBA"
+
+#: includes/class-dispatcher.php:369
+msgid "Unknown venue"
+msgstr "Luogo sconosciuto"
+
+#: includes/class-dispatcher.php:370
+msgid "Confirmed"
+msgstr "Confermato"
+
+#: includes/class-push-scenarios.php:43
+msgid "Blog/Articles"
+msgstr "Blog/Articoli"
+
+#: includes/class-push-scenarios.php:47
+#: includes/class-push-scenarios.php:312
+msgid "Publication"
+msgstr "Pubblicazione"
+
+#: includes/class-push-scenarios.php:48
+msgid "Triggered when a new article is published."
+msgstr "Attivato quando viene pubblicato un nuovo articolo."
+
+#: includes/class-push-scenarios.php:49
+msgid "New article: {post_title}"
+msgstr "Nuovo articolo: {post_title}"
+
+#: includes/class-push-scenarios.php:50
+#: includes/class-push-scenarios.php:214
+#: includes/class-push-scenarios.php:315
+msgid "{excerpt}"
+msgstr "{excerpt}"
+
+#: includes/class-push-scenarios.php:56
+#: includes/class-push-scenarios.php:321
+msgid "Major Update"
+msgstr "Aggiornamento importante"
+
+#: includes/class-push-scenarios.php:57
+msgid "Triggered when an important update is made to an existing article."
+msgstr "Attivato quando viene apportato un aggiornamento importante a un articolo esistente."
+
+#: includes/class-push-scenarios.php:58
+#: includes/class-push-scenarios.php:323
+msgid "Updated: {post_title}"
+msgstr "Aggiornato: {post_title}"
+
+#: includes/class-push-scenarios.php:59
+msgid "This article has been updated with new information."
+msgstr "Questo articolo è stato aggiornato con nuove informazioni."
+
+#: includes/class-push-scenarios.php:64
+msgid "Major Update Meta Key"
+msgstr "Meta key dell'aggiornamento importante"
+
+#: includes/class-push-scenarios.php:65
+msgid "Select the meta field that triggers this notification (e.g., \"major_update\")."
+msgstr "Seleziona il campo meta che attiva questa notifica (es. \"major_update\")."
+
+#: includes/class-push-scenarios.php:72
+msgid "Featured Article"
+msgstr "Articolo in evidenza"
+
+#: includes/class-push-scenarios.php:73
+msgid "Triggered when an article is marked as featured."
+msgstr "Attivato quando un articolo viene contrassegnato come in evidenza."
+
+#: includes/class-push-scenarios.php:74
+msgid "⭐ Featured: {post_title}"
+msgstr "⭐ In evidenza: {post_title}"
+
+#: includes/class-push-scenarios.php:75
+msgid "Check out our featured article!"
+msgstr "Guarda il nostro articolo in evidenza!"
+
+#: includes/class-push-scenarios.php:80
+msgid "Featured Meta Key"
+msgstr "Meta key della messa in evidenza"
+
+#: includes/class-push-scenarios.php:81
+msgid "Select the meta field for featured status (e.g., \"is_featured\")."
+msgstr "Seleziona il campo meta per lo stato in evidenza (es. \"is_featured\")."
+
+#: includes/class-push-scenarios.php:90
+msgid "Events/Concerts"
+msgstr "Eventi/Concerti"
+
+#: includes/class-push-scenarios.php:94
+msgid "New Event Published"
+msgstr "Nuovo evento pubblicato"
+
+#: includes/class-push-scenarios.php:95
+msgid "Triggered when a new event is published."
+msgstr "Attivato quando viene pubblicato un nuovo evento."
+
+#: includes/class-push-scenarios.php:96
+msgid "New event: {post_title}"
+msgstr "Nuovo evento: {post_title}"
+
+#: includes/class-push-scenarios.php:97
+msgid "{event_date} at {venue}"
+msgstr "{event_date} presso {venue}"
+
+#: includes/class-push-scenarios.php:103
+msgid "Ticket Sales Open"
+msgstr "Vendita biglietti aperta"
+
+#: includes/class-push-scenarios.php:104
+msgid "Triggered when ticket sales open for an event."
+msgstr "Attivato quando si apre la vendita dei biglietti per un evento."
+
+#: includes/class-push-scenarios.php:105
+msgid "🎟️ Tickets now available: {post_title}"
+msgstr "🎟️ Biglietti disponibili: {post_title}"
+
+#: includes/class-push-scenarios.php:106
+msgid "Get your tickets now for {event_date}!"
+msgstr "Acquista ora i tuoi biglietti per {event_date}!"
+
+#: includes/class-push-scenarios.php:111
+msgid "Sales Status Meta Key"
+msgstr "Meta key dello stato vendite"
+
+#: includes/class-push-scenarios.php:112
+msgid "Select the meta field for sales status (e.g., \"sales_status\")."
+msgstr "Seleziona il campo meta per lo stato vendite (es. \"sales_status\")."
+
+#: includes/class-push-scenarios.php:119
+msgid "Last Tickets Available"
+msgstr "Ultimi biglietti disponibili"
+
+#: includes/class-push-scenarios.php:120
+msgid "Triggered when remaining tickets fall below a threshold."
+msgstr "Attivato quando i biglietti rimanenti scendono sotto una soglia."
+
+#: includes/class-push-scenarios.php:121
+msgid "⚠️ Last tickets: {post_title}"
+msgstr "⚠️ Ultimi biglietti: {post_title}"
+
+#: includes/class-push-scenarios.php:122
+msgid "Hurry! Only a few tickets left for {event_date}!"
+msgstr "Affrettati! Restano pochi biglietti per {event_date}!"
+
+#: includes/class-push-scenarios.php:127
+msgid "Ticket Threshold"
+msgstr "Soglia biglietti"
+
+#: includes/class-push-scenarios.php:128
+msgid "Send notification when tickets remaining fall below this number."
+msgstr "Invia una notifica quando i biglietti rimanenti scendono sotto questo numero."
+
+#: includes/class-push-scenarios.php:133
+msgid "Tickets Remaining Meta Key"
+msgstr "Meta key dei biglietti rimanenti"
+
+#: includes/class-push-scenarios.php:134
+msgid "Select the meta field for remaining tickets count."
+msgstr "Seleziona il campo meta per il conteggio dei biglietti rimanenti."
+
+#: includes/class-push-scenarios.php:141
+msgid "Event Sold Out"
+msgstr "Evento esaurito"
+
+#: includes/class-push-scenarios.php:142
+msgid "Triggered when an event is sold out."
+msgstr "Attivato quando un evento è esaurito."
+
+#: includes/class-push-scenarios.php:143
+msgid "🔴 SOLD OUT: {post_title}"
+msgstr "🔴 ESAURITO: {post_title}"
+
+#: includes/class-push-scenarios.php:144
+msgid "This event is now sold out. Check our other events!"
+msgstr "Questo evento è esaurito. Guarda gli altri eventi!"
+
+#: includes/class-push-scenarios.php:149
+msgid "Sold Out Status Meta Key"
+msgstr "Meta key dello stato esaurito"
+
+#: includes/class-push-scenarios.php:150
+msgid "Select the meta field for sold out status."
+msgstr "Seleziona il campo meta per lo stato esaurito."
+
+#: includes/class-push-scenarios.php:157
+msgid "Event Cancelled"
+msgstr "Evento annullato"
+
+#: includes/class-push-scenarios.php:158
+msgid "Triggered when an event is cancelled."
+msgstr "Attivato quando un evento viene annullato."
+
+#: includes/class-push-scenarios.php:159
+msgid "❌ Cancelled: {post_title}"
+msgstr "❌ Annullato: {post_title}"
+
+#: includes/class-push-scenarios.php:160
+msgid "This event has been cancelled. Refunds will be processed."
+msgstr "Questo evento è stato annullato. I rimborsi saranno elaborati."
+
+#: includes/class-push-scenarios.php:165
+msgid "Cancelled Status Meta Key"
+msgstr "Meta key dello stato annullato"
+
+#: includes/class-push-scenarios.php:166
+msgid "Select the meta field for cancelled status."
+msgstr "Seleziona il campo meta per lo stato annullato."
+
+#: includes/class-push-scenarios.php:173
+msgid "Event Rescheduled"
+msgstr "Evento riprogrammato"
+
+#: includes/class-push-scenarios.php:174
+msgid "Triggered when an event date is changed."
+msgstr "Attivato quando la data di un evento cambia."
+
+#: includes/class-push-scenarios.php:175
+msgid "📅 Date changed: {post_title}"
+msgstr "📅 Data modificata: {post_title}"
+
+#: includes/class-push-scenarios.php:176
+msgid "New date: {event_date}"
+msgstr "Nuova data: {event_date}"
+
+#: includes/class-push-scenarios.php:181
+msgid "Event Date Meta Key"
+msgstr "Meta key della data evento"
+
+#: includes/class-push-scenarios.php:182
+msgid "Select the meta field for event date."
+msgstr "Seleziona il campo meta per la data evento."
+
+#: includes/class-push-scenarios.php:189
+msgid "Event Reminder"
+msgstr "Promemoria evento"
+
+#: includes/class-push-scenarios.php:190
+msgid "Scheduled reminder before the event (e.g., D-7 or D-1)."
+msgstr "Promemoria programmato prima dell'evento (es. D-7 o D-1)."
+
+#: includes/class-push-scenarios.php:191
+msgid "🔔 Reminder: {post_title}"
+msgstr "🔔 Promemoria: {post_title}"
+
+#: includes/class-push-scenarios.php:192
+msgid "Event coming up: {event_date}"
+msgstr "Evento in arrivo: {event_date}"
+
+#: includes/class-push-scenarios.php:197
+msgid "Days Before Event"
+msgstr "Giorni prima dell'evento"
+
+#: includes/class-push-scenarios.php:198
+msgid "Send reminder this many days before the event."
+msgstr "Invia il promemoria questo numero di giorni prima dell'evento."
+
+#: includes/class-push-scenarios.php:207
+msgid "E-commerce/Products"
+msgstr "E-commerce/Prodotti"
+
+#: includes/class-push-scenarios.php:211
+msgid "New Product"
+msgstr "Nuovo prodotto"
+
+#: includes/class-push-scenarios.php:212
+msgid "Triggered when a new product is published."
+msgstr "Attivato quando viene pubblicato un nuovo prodotto."
+
+#: includes/class-push-scenarios.php:213
+msgid "New product: {post_title}"
+msgstr "Nuovo prodotto: {post_title}"
+
+#: includes/class-push-scenarios.php:220
+msgid "Price Drop / Promotion"
+msgstr "Ribasso prezzo / Promozione"
+
+#: includes/class-push-scenarios.php:221
+msgid "Triggered when product price drops or a promotion starts."
+msgstr "Attivato quando il prezzo del prodotto scende o inizia una promozione."
+
+#: includes/class-push-scenarios.php:222
+msgid "💰 Price drop: {post_title}"
+msgstr "💰 Ribasso prezzo: {post_title}"
+
+#: includes/class-push-scenarios.php:223
+msgid "Now only {price}! Limited time offer."
+msgstr "Ora solo {price}! Offerta a tempo limitato."
+
+#: includes/class-push-scenarios.php:228
+msgid "Price Meta Key"
+msgstr "Meta key del prezzo"
+
+#: includes/class-push-scenarios.php:229
+msgid "Select the meta field for product price."
+msgstr "Seleziona il campo meta per il prezzo del prodotto."
+
+#: includes/class-push-scenarios.php:236
+msgid "Back in Stock"
+msgstr "Di nuovo disponibile"
+
+#: includes/class-push-scenarios.php:237
+msgid "Triggered when a product is back in stock."
+msgstr "Attivato quando un prodotto torna disponibile."
+
+#: includes/class-push-scenarios.php:238
+msgid "✅ Back in stock: {post_title}"
+msgstr "✅ Di nuovo disponibile: {post_title}"
+
+#: includes/class-push-scenarios.php:239
+msgid "Get it while supplies last!"
+msgstr "Prendilo finché ci sono scorte!"
+
+#: includes/class-push-scenarios.php:244
+#: includes/class-push-scenarios.php:260
+msgid "Stock Status Meta Key"
+msgstr "Meta key dello stato stock"
+
+#: includes/class-push-scenarios.php:245
+#: includes/class-push-scenarios.php:261
+msgid "Select the meta field for stock status."
+msgstr "Seleziona il campo meta per lo stato stock."
+
+#: includes/class-push-scenarios.php:252
+msgid "Out of Stock"
+msgstr "Esaurito"
+
+#: includes/class-push-scenarios.php:253
+msgid "Triggered when a product runs out of stock."
+msgstr "Attivato quando un prodotto esaurisce le scorte."
+
+#: includes/class-push-scenarios.php:254
+msgid "🔴 Out of stock: {post_title}"
+msgstr "🔴 Esaurito: {post_title}"
+
+#: includes/class-push-scenarios.php:255
+msgid "This item is currently unavailable."
+msgstr "Questo articolo non è disponibile al momento."
+
+#: includes/class-push-scenarios.php:268
+msgid "Low Stock Alert"
+msgstr "Avviso scorte basse"
+
+#: includes/class-push-scenarios.php:269
+msgid "Triggered when stock falls below a threshold."
+msgstr "Attivato quando le scorte scendono sotto una soglia."
+
+#: includes/class-push-scenarios.php:270
+msgid "⚠️ Low stock: {post_title}"
+msgstr "⚠️ Scorte basse: {post_title}"
+
+#: includes/class-push-scenarios.php:271
+msgid "Hurry! Only {stock} left!"
+msgstr "Affrettati! Ne restano solo {stock}!"
+
+#: includes/class-push-scenarios.php:276
+msgid "Low Stock Threshold"
+msgstr "Soglia scorte basse"
+
+#: includes/class-push-scenarios.php:277
+msgid "Send notification when stock falls below this number."
+msgstr "Invia una notifica quando le scorte scendono sotto questo numero."
+
+#: includes/class-push-scenarios.php:282
+msgid "Stock Quantity Meta Key"
+msgstr "Meta key della quantità in stock"
+
+#: includes/class-push-scenarios.php:283
+msgid "Select the meta field for stock quantity."
+msgstr "Seleziona il campo meta per la quantità in stock."
+
+#: includes/class-push-scenarios.php:290
+msgid "End of Life / Discontinued"
+msgstr "Fine vita / Fuori produzione"
+
+#: includes/class-push-scenarios.php:291
+msgid "Triggered when a product is being retired or discontinued."
+msgstr "Attivato quando un prodotto viene ritirato o dismesso."
+
+#: includes/class-push-scenarios.php:292
+msgid "⚠️ Last chance: {post_title}"
+msgstr "⚠️ Ultima occasione: {post_title}"
+
+#: includes/class-push-scenarios.php:293
+msgid "This product will soon be discontinued."
+msgstr "Questo prodotto sarà presto fuori produzione."
+
+#: includes/class-push-scenarios.php:298
+msgid "EOL Status Meta Key"
+msgstr "Meta key dello stato fine vita"
+
+#: includes/class-push-scenarios.php:299
+msgid "Select the meta field for end-of-life status."
+msgstr "Seleziona il campo meta per lo stato fine vita."
+
+#: includes/class-push-scenarios.php:308
+msgid "Generic/Other"
+msgstr "Generico/Altro"
+
+#: includes/class-push-scenarios.php:313
+msgid "Triggered when a new item is published."
+msgstr "Attivato quando viene pubblicato un nuovo elemento."
+
+#: includes/class-push-scenarios.php:314
+msgid "New: {post_title}"
+msgstr "Nuovo: {post_title}"
+
+#: includes/class-push-scenarios.php:322
+msgid "Triggered when an important update is made."
+msgstr "Attivato quando viene effettuato un aggiornamento importante."
+
+#: includes/class-push-scenarios.php:324
+msgid "This item has been updated."
+msgstr "Questo elemento è stato aggiornato."
+
+#: includes/class-push-scenarios.php:329
+msgid "Update Trigger Meta Key"
+msgstr "Meta key dell'attivatore di aggiornamento"
+
+#: includes/class-push-scenarios.php:330
+msgid "Select the meta field that triggers this notification."
+msgstr "Seleziona il campo meta che attiva questa notifica."
+
+#: includes/class-push-scenarios.php:337
+msgid "Status Change"
+msgstr "Cambio di stato"
+
+#: includes/class-push-scenarios.php:338
+msgid "Triggered when a custom status field changes."
+msgstr "Attivato quando cambia un campo stato personalizzato."
+
+#: includes/class-push-scenarios.php:339
+msgid "{status_label}: {post_title}"
+msgstr "{status_label}: {post_title}"
+
+#: includes/class-push-scenarios.php:340
+msgid "Status has been updated."
+msgstr "Lo stato è stato aggiornato."
+
+#: includes/class-push-scenarios.php:345
+msgid "Status Meta Key"
+msgstr "Meta key dello stato"
+
+#: includes/class-push-scenarios.php:346
+msgid "Select the meta field for status."
+msgstr "Seleziona il campo meta per lo stato."
+
+#: includes/class-push-scenarios.php:485
+msgid "Common Placeholders"
+msgstr "Segnaposto comuni"
+
+#: includes/class-push-scenarios.php:487
+msgid "Post title"
+msgstr "Titolo del post"
+
+#: includes/class-push-scenarios.php:488
+msgid "Post excerpt"
+msgstr "Estratto del post"
+
+#: includes/class-push-scenarios.php:489
+msgid "Post URL"
+msgstr "URL del post"
+
+#: includes/class-push-scenarios.php:490
+msgid "Post type name"
+msgstr "Nome del tipo di contenuto"
+
+#: includes/class-push-scenarios.php:491
+msgid "Site name"
+msgstr "Nome del sito"
+
+#: includes/class-push-scenarios.php:495
+msgid "Event Placeholders"
+msgstr "Segnaposto eventi"
+
+#: includes/class-push-scenarios.php:497
+msgid "Event date"
+msgstr "Data evento"
+
+#: includes/class-push-scenarios.php:498
+msgid "Event venue/location"
+msgstr "Luogo/posizione evento"
+
+#: includes/class-push-scenarios.php:499
+msgid "Event status label"
+msgstr "Etichetta dello stato evento"
+
+#: includes/class-push-scenarios.php:503
+msgid "E-commerce Placeholders"
+msgstr "Segnaposto e-commerce"
+
+#: includes/class-push-scenarios.php:505
+msgid "Product price"
+msgstr "Prezzo del prodotto"
+
+#: includes/class-push-scenarios.php:506
+msgid "Stock quantity"
+msgstr "Quantità in stock"
+
+#: includes/class-push-scenarios.php:507
+msgid "Stock status label"
+msgstr "Etichetta dello stato stock"
+
+#: includes/class-push-settings.php:68
+msgid "Test Notifications"
+msgstr "Test notifiche"
+
+#: includes/class-push-settings.php:84
+msgid "No post types are enabled for Web Push."
+msgstr "Nessun tipo di contenuto è abilitato per Web Push."
+
+#: includes/class-push-settings.php:85
+msgid "Configure Post Types"
+msgstr "Configura tipi di contenuto"
+
+#. translators: %1$s: post type, %2$s: error message
+#: includes/class-push-settings.php:104
+msgid "Error rendering %1$s: %2$s"
+msgstr "Errore durante il rendering di %1$s: %2$s"
+
+#: includes/class-push-settings.php:148
+#: includes/class-push-settings.php:322
+#: includes/class-ssl-helper.php:251
+msgid "Enabled"
+msgstr "Attivato"
+
+#: includes/class-push-settings.php:151
+#: includes/class-push-settings.php:322
+#: includes/class-ssl-helper.php:254
+msgid "Disabled"
+msgstr "Disattivato"
+
+#: includes/class-push-settings.php:163
+msgid "Configure push notification templates for each post type."
+msgstr "Configura i template delle notifiche push per ogni tipo di contenuto."
+
+#: includes/class-push-settings.php:164
+msgid "Available placeholders: {post_title}, {permalink}, {excerpt}, {post_type}, {event_date}, {venue}, {status_label}"
+msgstr "Segnaposto disponibili: {post_title}, {permalink}, {excerpt}, {post_type}, {event_date}, {venue}, {status_label}"
+
+#: includes/class-push-settings.php:221
+msgid "Configure push notification scenarios and templates for this post type."
+msgstr "Configura scenari e template delle notifiche push per questo tipo di contenuto."
+
+#: includes/class-push-settings.php:228
+msgid "General Configuration"
+msgstr "Configurazione generale"
+
+#: includes/class-push-settings.php:233
+msgid "Enable Notifications"
+msgstr "Abilita notifiche"
+
+#: includes/class-push-settings.php:241
+msgid "Enable push notifications for this post type"
+msgstr "Abilita notifiche push per questo tipo di contenuto"
+
+#: includes/class-push-settings.php:244
+msgid "Master switch: when disabled, no notifications will be sent regardless of scenario settings."
+msgstr "Interruttore principale: quando disabilitato, non verrà inviata alcuna notifica indipendentemente dalle impostazioni dello scenario."
+
+#: includes/class-push-settings.php:254
+msgid "Notification Scenarios"
+msgstr "Scenari di notifica"
+
+#: includes/class-push-settings.php:257
+msgid "Configure different notification scenarios for various post events and triggers."
+msgstr "Configura diversi scenari di notifica per vari eventi e trigger del post."
+
+#. translators: %s: role label
+#: includes/class-push-settings.php:266
+msgid "No scenarios found for role \"%s\". Please check your configuration."
+msgstr "Nessuno scenario trovato per il ruolo \"%s\". Verifica la configurazione."
+
+#: includes/class-push-settings.php:285
+msgid "Save Changes"
+msgstr "Salva modifiche"
+
+#: includes/class-push-settings.php:334
+msgid "Enable Scenario"
+msgstr "Abilita scenario"
+
+#. translators: %s: scenario label
+#: includes/class-push-settings.php:347
+msgid "Enable \"%s\" notifications"
+msgstr "Abilita notifiche \"%s\""
+
+#: includes/class-push-settings.php:360
+#: includes/class-scenario-manager-ui.php:484
+msgid "Title Template"
+msgstr "Template titolo"
+
+#: includes/class-push-settings.php:380
+#: includes/class-scenario-manager-ui.php:499
+msgid "Body Template"
+msgstr "Template corpo"
+
+#: includes/class-push-settings.php:400
+#: includes/class-scenario-manager-ui.php:513
+msgid "URL Template"
+msgstr "Template URL"
+
+#: includes/class-push-settings.php:411
+msgid "Available: {permalink}"
+msgstr "Disponibile: {permalink}"
+
+#: includes/class-push-settings.php:473
+msgid "-- Select a meta field --"
+msgstr "-- Seleziona un campo meta --"
+
+#: includes/class-push-settings.php:476
+msgid "Suggested"
+msgstr "Suggerito"
+
+#: includes/class-push-settings.php:480
+msgid "(default)"
+msgstr "(predefinito)"
+
+#: includes/class-push-settings.php:486
+msgid "Available Meta Keys"
+msgstr "Meta key disponibili"
+
+#: includes/class-push-settings.php:506
+msgid "Or enter custom:"
+msgstr "Oppure inserisci un valore personalizzato:"
+
+#: includes/class-push-settings.php:510
+msgid "Enter custom meta key"
+msgstr "Inserisci meta key personalizzata"
+
+#: includes/class-push-settings.php:593
+msgid "Available: "
+msgstr ""
+
+#: includes/class-push-settings.php:606
+#: includes/class-push-settings.php:616
+msgid "Test Notification"
+msgstr "Notifica di test"
+
+#: includes/class-push-settings.php:608
+msgid "Send a test push notification to all subscribed devices."
+msgstr "Invia una notifica push di test a tutti i dispositivi sottoscritti."
+
+#: includes/class-push-settings.php:613
+msgid "Title"
+msgstr "Titolo"
+
+#: includes/class-push-settings.php:621
+msgid "Body"
+msgstr "Corpo"
+
+#: includes/class-push-settings.php:624
+msgid "This is a test push notification from Custom PWA plugin."
+msgstr "Questa è una notifica push di test dal plugin Custom PWA."
+
+#: includes/class-push-settings.php:629
+msgid "URL"
+msgstr "URL"
+
+#: includes/class-push-settings.php:639
+msgid "Send Test Notification"
+msgstr "Invia notifica di test"
+
+#: includes/class-push-settings.php:723
+msgid "Title and body are required."
+msgstr "Titolo e corpo sono obbligatori."
+
+#: includes/class-push-settings.php:748
+msgid "No active subscriptions found."
+msgstr "Nessuna sottoscrizione attiva trovata."
+
+#. translators: %1$d: sent count, %2$d: failed count
+#: includes/class-push-settings.php:782
+msgid "Sent: %1$d, Failed: %2$d"
+msgstr "Inviate: %1$d, Fallite: %2$d"
+
+#: includes/class-pwa-settings.php:61
+msgid "PWA Configuration"
+msgstr "Configurazione PWA"
+
+#: includes/class-pwa-settings.php:69
+msgid "App Name"
+msgstr "Nome applicazione"
+
+#: includes/class-pwa-settings.php:78
+msgid "Short Name"
+msgstr "Nome breve"
+
+#: includes/class-pwa-settings.php:87
+#: includes/class-scenario-manager-ui.php:103
+#: includes/class-scenario-manager-ui.php:292
+msgid "Description"
+msgstr "Descrizione"
+
+#: includes/class-pwa-settings.php:96
+msgid "Start URL"
+msgstr "URL iniziale"
+
+#: includes/class-pwa-settings.php:105
+msgid "Theme Color"
+msgstr "Colore tema"
+
+#: includes/class-pwa-settings.php:114
+msgid "Background Color"
+msgstr "Colore sfondo"
+
+#: includes/class-pwa-settings.php:123
+msgid "Display Mode"
+msgstr "Modalità visualizzazione"
+
+#: includes/class-pwa-settings.php:132
+msgid "App Icon"
+msgstr "Icona app"
+
+#: includes/class-pwa-settings.php:141
+msgid "Screenshots"
+msgstr "Screenshot"
+
+#: includes/class-pwa-settings.php:164
+msgid "Manifest Preview"
+msgstr "Anteprima manifest"
+
+#: includes/class-pwa-settings.php:166
+msgid "Manifest URL:"
+msgstr "URL manifest:"
+
+#: includes/class-pwa-settings.php:179
+msgid "Configure your Progressive Web App manifest settings."
+msgstr "Configura le impostazioni del manifest della tua Progressive Web App."
+
+#: includes/class-pwa-settings.php:196
+msgid "The name of your Progressive Web App as it will appear to users."
+msgstr "Il nome della tua Progressive Web App come apparirà agli utenti."
+
+#: includes/class-pwa-settings.php:215
+msgid "A shorter name used when space is limited (e.g., home screen)."
+msgstr "Un nome più corto usato quando lo spazio è limitato (es. schermata home)."
+
+#: includes/class-pwa-settings.php:233
+msgid "A brief description of your app."
+msgstr "Una breve descrizione della tua app."
+
+#: includes/class-pwa-settings.php:252
+msgid "The URL that loads when a user launches your app."
+msgstr "L'URL che viene caricata quando un utente avvia la tua app."
+
+#: includes/class-pwa-settings.php:271
+msgid "The theme color for the browser UI (hex format, e.g., #000000)."
+msgstr "Il colore del tema per l'interfaccia del browser (formato esadecimale, es. #000000)."
+
+#: includes/class-pwa-settings.php:290
+msgid "The background color for the splash screen (hex format, e.g., #ffffff)."
+msgstr "Il colore di sfondo per la schermata di avvio (formato esadecimale, es. #ffffff)."
+
+#: includes/class-pwa-settings.php:303
+msgid "Fullscreen"
+msgstr "Schermo intero"
+
+#: includes/class-pwa-settings.php:304
+msgid "Standalone"
+msgstr "Autonoma"
+
+#: includes/class-pwa-settings.php:305
+msgid "Minimal UI"
+msgstr "UI minima"
+
+#: includes/class-pwa-settings.php:306
+msgid "Browser"
+msgstr "Browser"
+
+#: includes/class-pwa-settings.php:317
+msgid "How the app should be displayed when launched."
+msgstr "Come l'app deve essere mostrata all'avvio."
+
+#: includes/class-pwa-settings.php:343
+msgid "Upload Icon"
+msgstr "Carica icona"
+
+#: includes/class-pwa-settings.php:346
+msgid "Remove Icon"
+msgstr "Rimuovi icona"
+
+#: includes/class-pwa-settings.php:349
+msgid "Upload a square icon (at least 512x512px). Falls back to Site Icon if not set."
+msgstr "Carica un'icona quadrata (almeno 512x512px). Se non impostata, verrà usata l'icona del sito."
+
+#: includes/class-pwa-settings.php:366
+msgid "Select App Icon"
+msgstr "Seleziona icona app"
+
+#: includes/class-pwa-settings.php:368
+msgid "Use this icon"
+msgstr "Usa questa icona"
+
+#: includes/class-pwa-settings.php:426
+#: includes/class-pwa-settings.php:475
+msgid "Remove"
+msgstr "Rimuovi"
+
+#: includes/class-pwa-settings.php:434
+msgid "Add Mobile Screenshot"
+msgstr "Aggiungi screenshot mobile"
+
+#: includes/class-pwa-settings.php:437
+msgid "Add Desktop Screenshot"
+msgstr "Aggiungi screenshot desktop"
+
+#: includes/class-pwa-settings.php:440
+msgid "Add screenshots for richer PWA install UI. Mobile: portrait (narrow), Desktop: landscape (wide). Recommended sizes: 540x720px (mobile), 1280x720px (desktop)."
+msgstr "Aggiungi screenshot per un'interfaccia di installazione PWA più ricca. Mobile: verticale (stretta), Desktop: orizzontale (larga). Dimensioni consigliate: 540x720px (mobile), 1280x720px (desktop)."
+
+#: includes/class-pwa-settings.php:454
+msgid "Select Desktop Screenshot"
+msgstr "Seleziona screenshot desktop"
+
+#: includes/class-pwa-settings.php:454
+msgid "Select Mobile Screenshot"
+msgstr "Seleziona screenshot mobile"
+
+#: includes/class-pwa-settings.php:456
+msgid "Use this screenshot"
+msgstr "Usa questo screenshot"
+
+#: includes/class-scenario-handlers.php:132
+msgid "Scenario created successfully."
+msgstr "Scenario creato con successo."
+
+#: includes/class-scenario-handlers.php:135
+msgid "Scenario updated successfully."
+msgstr "Scenario aggiornato con successo."
+
+#: includes/class-scenario-handlers.php:151
+msgid "Failed to create scenario. Please check your input and try again."
+msgstr "Impossibile creare lo scenario. Controlla i dati e riprova."
+
+#: includes/class-scenario-handlers.php:154
+msgid "Failed to update scenario. Please check your input and try again."
+msgstr "Impossibile aggiornare lo scenario. Controlla i dati e riprova."
+
+#: includes/class-scenario-manager-ui.php:35
+msgid "Scenario deleted successfully."
+msgstr "Scenario eliminato con successo."
+
+#: includes/class-scenario-manager-ui.php:39
+msgid "Failed to delete scenario."
+msgstr "Impossibile eliminare lo scenario."
+
+#: includes/class-scenario-manager-ui.php:71
+msgid "Scenario Manager"
+msgstr "Gestione scenari"
+
+#: includes/class-scenario-manager-ui.php:73
+msgid "Manage notification scenarios. Built-in scenarios are pre-configured by role. You can create custom scenarios for more flexibility."
+msgstr "Gestisci gli scenari di notifica. Gli scenari integrati sono preconfigurati per ruolo. Puoi creare scenari personalizzati per maggiore flessibilità."
+
+#: includes/class-scenario-manager-ui.php:79
+#: includes/class-scenario-manager-ui.php:247
+msgid "Add Custom Scenario"
+msgstr "Aggiungi scenario personalizzato"
+
+#: includes/class-scenario-manager-ui.php:86
+msgid "Built-in Scenarios (by Role)"
+msgstr "Scenari integrati (per ruolo)"
+
+#: includes/class-scenario-manager-ui.php:89
+msgid "These scenarios are pre-configured and available based on the role assigned to each post type. You can customize templates per post type but cannot delete these scenarios."
+msgstr "Questi scenari sono preconfigurati e disponibili in base al ruolo assegnato a ciascun tipo di contenuto. Puoi personalizzare i template per tipo di contenuto, ma non puoi eliminare questi scenari."
+
+#: includes/class-scenario-manager-ui.php:102
+#: includes/class-scenario-manager-ui.php:153
+msgid "Scenario"
+msgstr "Scenario"
+
+#: includes/class-scenario-manager-ui.php:104
+msgid "Type"
+msgstr "Tipo"
+
+#: includes/class-scenario-manager-ui.php:119
+msgid "Built-in"
+msgstr "Integrato"
+
+#: includes/class-scenario-manager-ui.php:133
+msgid "Custom Scenarios"
+msgstr "Scenari personalizzati"
+
+#: includes/class-scenario-manager-ui.php:142
+msgid "No custom scenarios yet."
+msgstr "Nessuno scenario personalizzato ancora."
+
+#: includes/class-scenario-manager-ui.php:143
+msgid "Create custom scenarios for more flexibility beyond role-based defaults."
+msgstr "Crea scenari personalizzati per maggiore flessibilità oltre ai valori predefiniti basati sui ruoli."
+
+#: includes/class-scenario-manager-ui.php:146
+msgid "Create Your First Scenario"
+msgstr "Crea il tuo primo scenario"
+
+#: includes/class-scenario-manager-ui.php:154
+#: includes/class-scenario-manager-ui.php:305
+msgid "Scope"
+msgstr "Ambito"
+
+#: includes/class-scenario-manager-ui.php:155
+msgid "Trigger"
+msgstr "Attivatore"
+
+#: includes/class-scenario-manager-ui.php:169
+#: includes/class-scenario-manager-ui.php:312
+msgid "Global"
+msgstr "Globale"
+
+#. translators: %d: number of post types
+#: includes/class-scenario-manager-ui.php:177
+msgid "%d post type"
+msgid_plural "%d post types"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/class-scenario-manager-ui.php:194
+msgid "Edit"
+msgstr "Modifica"
+
+#: includes/class-scenario-manager-ui.php:200
+msgid "Delete"
+msgstr "Elimina"
+
+#: includes/class-scenario-manager-ui.php:218
+msgid "Are you sure you want to delete the scenario"
+msgstr "Sei sicuro di voler eliminare lo scenario"
+
+#: includes/class-scenario-manager-ui.php:218
+msgid "This will remove the scenario from all post types."
+msgstr "Questo rimuoverà lo scenario da tutti i tipi di contenuto."
+
+#: includes/class-scenario-manager-ui.php:248
+msgid "Edit Custom Scenario"
+msgstr "Modifica scenario personalizzato"
+
+#: includes/class-scenario-manager-ui.php:256
+msgid "Back to Scenarios"
+msgstr "Torna agli scenari"
+
+#: includes/class-scenario-manager-ui.php:277
+msgid "Scenario Name"
+msgstr "Nome dello scenario"
+
+#: includes/class-scenario-manager-ui.php:284
+msgid "A short, descriptive name for this scenario (e.g., \"Flash Sale Alert\", \"Event Reminder\")."
+msgstr "Un nome breve e descrittivo per questo scenario (es. \"Avviso offerta lampo\", \"Promemoria evento\")."
+
+#: includes/class-scenario-manager-ui.php:298
+msgid "Explain what triggers this notification and when it should be sent."
+msgstr "Spiega cosa attiva questa notifica e quando deve essere inviata."
+
+#: includes/class-scenario-manager-ui.php:314
+msgid "Available for all enabled post types."
+msgstr "Disponibile per tutti i tipi di contenuto abilitati."
+
+#: includes/class-scenario-manager-ui.php:321
+msgid "Post-Type Specific"
+msgstr "Specifico per tipo di contenuto"
+
+#: includes/class-scenario-manager-ui.php:323
+msgid "Available only for selected post types."
+msgstr "Disponibile solo per i tipi di contenuto selezionati."
+
+#: includes/class-scenario-manager-ui.php:331
+msgid "Select Post Types:"
+msgstr "Seleziona tipi di contenuto:"
+
+#: includes/class-scenario-manager-ui.php:360
+msgid "Trigger Type"
+msgstr "Tipo di trigger"
+
+#: includes/class-scenario-manager-ui.php:373
+msgid "When should this notification be triggered?"
+msgstr "Quando deve essere attivata questa notifica?"
+
+#: includes/class-scenario-manager-ui.php:381
+msgid "Meta Key / Field Name"
+msgstr "Meta key / Nome campo"
+
+#: includes/class-scenario-manager-ui.php:388
+msgid "The custom field or meta key to monitor (e.g., \"event_date\", \"_stock\", \"concert_status\")."
+msgstr "Il campo personalizzato o la meta key da monitorare (es. \"event_date\", \"_stock\", \"concert_status\")."
+
+#: includes/class-scenario-manager-ui.php:395
+msgid "Condition (Optional)"
+msgstr "Condizione (opzionale)"
+
+#: includes/class-scenario-manager-ui.php:400
+msgid "Old Value"
+msgstr "Valore precedente"
+
+#: includes/class-scenario-manager-ui.php:405
+msgid "e.g., draft"
+msgstr "es. draft"
+
+#: includes/class-scenario-manager-ui.php:410
+msgid "New Value"
+msgstr "Nuovo valore"
+
+#: includes/class-scenario-manager-ui.php:415
+msgid "e.g., publish"
+msgstr "es. publish"
+
+#: includes/class-scenario-manager-ui.php:419
+msgid "Optionally specify when to trigger (e.g., status changes from \"draft\" to \"publish\")."
+msgstr "Specifica opzionalmente quando attivare (es. cambio di stato da \"draft\" a \"publish\")."
+
+#: includes/class-scenario-manager-ui.php:427
+msgid "Core Fields Used"
+msgstr "Campi principali utilizzati"
+
+#: includes/class-scenario-manager-ui.php:447
+msgid "Select which post fields will be used in templates and conditions."
+msgstr "Seleziona quali campi del post verranno usati nei template e nelle condizioni."
+
+#: includes/class-scenario-manager-ui.php:455
+msgid "Meta Keys Used"
+msgstr "Meta key utilizzate"
+
+#: includes/class-scenario-manager-ui.php:464
+msgid "Enter custom field/meta key names (one per line) that will be available as placeholders."
+msgstr "Inserisci i nomi dei campi personalizzati/meta key (uno per riga) che saranno disponibili come segnaposto."
+
+#: includes/class-scenario-manager-ui.php:473
+msgid "Default Templates"
+msgstr "Template predefiniti"
+
+#: includes/class-scenario-manager-ui.php:476
+msgid "These are the default templates. They can be overridden per post type."
+msgstr "Questi sono i template predefiniti. Possono essere sovrascritti per tipo di contenuto."
+
+#: includes/class-scenario-manager-ui.php:491
+msgid "Use placeholders like {post_title}, {post_date}, or custom field names."
+msgstr "Usa segnaposto come {post_title}, {post_date} o nomi di campi personalizzati."
+
+#: includes/class-scenario-manager-ui.php:505
+msgid "Use placeholders like {excerpt}, {post_content}, or custom field names."
+msgstr "Usa segnaposto come {excerpt}, {post_content} o nomi di campi personalizzati."
+
+#: includes/class-scenario-manager-ui.php:520
+msgid "Use {permalink} for post URL or customize as needed."
+msgstr "Usa {permalink} per l'URL del post o personalizzalo secondo necessità."
+
+#: includes/class-scenario-manager-ui.php:527
+msgid "Create Scenario"
+msgstr "Crea scenario"
+
+#: includes/class-scenario-manager-ui.php:527
+msgid "Update Scenario"
+msgstr "Aggiorna scenario"
+
+#: includes/class-scenario-manager-ui.php:530
+msgid "Cancel"
+msgstr "Annulla"
+
+#: includes/class-ssl-helper.php:36
+#: includes/class-ssl-helper.php:226
+msgid "SSL Setup Helper"
+msgstr "Assistente configurazione SSL"
+
+#: includes/class-ssl-helper.php:37
+msgid "SSL Helper"
+msgstr "Assistente SSL"
+
+#: includes/class-ssl-helper.php:134
+msgid "🔒 SSL Certificate Warning"
+msgstr "🔒 Avviso certificato SSL"
+
+#: includes/class-ssl-helper.php:138
+msgid "Service Workers require a valid SSL certificate. Your local development environment uses a self-signed certificate that browsers will block."
+msgstr "I Service Worker richiedono un certificato SSL valido. Il tuo ambiente di sviluppo locale utilizza un certificato autofirmato che i browser bloccheranno."
+
+#: includes/class-ssl-helper.php:140
+msgid "Service Workers require HTTPS. Your site is not using a secure connection."
+msgstr "I Service Worker richiedono HTTPS. Il tuo sito non utilizza una connessione sicura."
+
+#: includes/class-ssl-helper.php:146
+msgid "Quick Fix:"
+msgstr "Soluzione rapida:"
+
+#: includes/class-ssl-helper.php:147
+msgid "Use mkcert to generate a valid local SSL certificate."
+msgstr "Usa mkcert per generare un certificato SSL locale valido."
+
+#: includes/class-ssl-helper.php:151
+msgid "Open SSL Setup Helper"
+msgstr "Apri assistente configurazione SSL"
+
+#: includes/class-ssl-helper.php:154
+msgid "Copy Installation Command"
+msgstr "Copia comando di installazione"
+
+#: includes/class-ssl-helper.php:160
+msgid "Learn How to Enable HTTPS"
+msgstr "Scopri come abilitare HTTPS"
+
+#: includes/class-ssl-helper.php:229
+msgid "Current Status"
+msgstr "Stato attuale"
+
+#: includes/class-ssl-helper.php:233
+msgid "Domain:"
+msgstr "Dominio:"
+
+#: includes/class-ssl-helper.php:238
+msgid "Local Development"
+msgstr "Sviluppo locale"
+
+#: includes/class-ssl-helper.php:241
+msgid "Production"
+msgstr "Produzione"
+
+#: includes/class-ssl-helper.php:246
+msgid "HTTPS Enabled:"
+msgstr "HTTPS abilitato:"
+
+#: includes/class-ssl-helper.php:260
+msgid "mkcert Installed:"
+msgstr "mkcert installato:"
+
+#: includes/class-ssl-helper.php:268
+msgid "Not Installed"
+msgstr "Non installato"
+
+#: includes/class-ssl-helper.php:274
+msgid "SSL Certificate:"
+msgstr "Certificato SSL:"
+
+#: includes/class-ssl-helper.php:279
+msgid "Valid - Service Workers will work"
+msgstr "Valido - i Service Worker funzioneranno"
+
+#: includes/class-ssl-helper.php:282
+msgid "Invalid - Service Workers blocked"
+msgstr "Non valido - Service Worker bloccati"
+
+#: includes/class-ssl-helper.php:292
+msgid "Installation Instructions"
+msgstr "Istruzioni di installazione"
+
+#: includes/class-ssl-helper.php:294
+msgid "Option 1: Automatic Installation (Recommended)"
+msgstr "Opzione 1: Installazione automatica (consigliata)"
+
+#: includes/class-ssl-helper.php:295
+msgid "Copy and paste this command in your terminal:"
+msgstr "Copia e incolla questo comando nel terminale:"
+
+#: includes/class-ssl-helper.php:299
+msgid "Copy Command"
+msgstr "Copia comando"
+
+#: includes/class-ssl-helper.php:302
+msgid "This will install mkcert, generate a valid certificate, and configure nginx automatically."
+msgstr "Questo installerà mkcert, genererà un certificato valido e configurerà nginx automaticamente."
+
+#: includes/class-ssl-helper.php:304
+msgid "Option 2: Manual Steps"
+msgstr "Opzione 2: Passaggi manuali"
+
+#: includes/class-ssl-helper.php:307
+msgid "Install mkcert:"
+msgstr "Installa mkcert:"
+
+#: includes/class-ssl-helper.php:315
+msgid "Generate certificate:"
+msgstr "Genera certificato:"
+
+#: includes/class-ssl-helper.php:322
+msgid "Update nginx config:"
+msgstr "Aggiorna la configurazione di nginx:"
+
+#: includes/class-ssl-helper.php:327
+msgid "Reload nginx:"
+msgstr "Ricarica nginx:"
+
+#: includes/class-ssl-helper.php:333
+msgid "Option 3: Chrome Development Flags (Temporary)"
+msgstr "Opzione 3: Flag di sviluppo Chrome (temporanei)"
+
+#: includes/class-ssl-helper.php:334
+msgid "For quick testing only (not recommended for daily use):"
+msgstr "Solo per test rapidi (non consigliato per l'uso quotidiano):"
+
+#: includes/class-ssl-helper.php:337
+msgid "⚠️ Warning: Only use this Chrome profile for local development. Never browse other websites with these flags!"
+msgstr "⚠️ Avviso: usa questo profilo Chrome solo per sviluppo locale. Non navigare su altri siti con questi flag!"
+
+#: includes/class-ssl-helper.php:341
+msgid "After Installation"
+msgstr "Dopo l'installazione"
+
+#: includes/class-ssl-helper.php:343
+msgid "Close and restart your browser completely"
+msgstr "Chiudi e riavvia completamente il browser"
+
+#: includes/class-ssl-helper.php:344
+msgid "Visit your site and open the browser console (F12)"
+msgstr "Visita il tuo sito e apri la console del browser (F12)"
+
+#: includes/class-ssl-helper.php:345
+msgid "You should see: \"[Custom PWA] Service Worker registered successfully\""
+msgstr "Dovresti vedere: \"[Custom PWA] Service Worker registrato con successo\""
+
+#: includes/class-ssl-helper.php:346
+msgid "Test push notifications from the Push menu"
+msgstr "Testa le notifiche push dal menu Push"
+
+#: includes/class-ssl-helper.php:356
+msgid "✓ Your SSL certificate is valid! Service Workers will work correctly."
+msgstr "✓ Il tuo certificato SSL è valido! I Service Worker funzioneranno correttamente."
+
+#: includes/class-ssl-helper.php:361
+msgid "Additional Resources"
+msgstr "Risorse aggiuntive"
+
+#: includes/class-ssl-helper.php:363
+msgid "Complete SSL Setup Documentation"
+msgstr "Documentazione completa per la configurazione SSL"
+
+#: includes/class-ssl-helper.php:364
+msgid "mkcert GitHub Repository"
+msgstr "Repository GitHub di mkcert"
+
+#: includes/class-ssl-helper.php:365
+msgid "Service Workers Documentation"
+msgstr "Documentazione Service Worker"
+
+#: includes/class-subscriptions.php:184
+msgid "Invalid subscription keys."
+msgstr "Chiavi di sottoscrizione non valide."
+
+#: includes/class-subscriptions.php:227
+msgid "Failed to update subscription."
+msgstr "Impossibile aggiornare la sottoscrizione."
+
+#: includes/class-subscriptions.php:235
+msgid "Subscription updated successfully."
+msgstr "Sottoscrizione aggiornata con successo."
+
+#: includes/class-subscriptions.php:260
+msgid "Failed to create subscription."
+msgstr "Impossibile creare la sottoscrizione."
+
+#: includes/class-subscriptions.php:268
+msgid "Subscription created successfully."
+msgstr "Sottoscrizione creata con successo."
+
+#: includes/class-subscriptions.php:303
+msgid "Failed to unsubscribe."
+msgstr "Impossibile annullare la sottoscrizione."
+
+#: includes/class-subscriptions.php:311
+msgid "Unsubscribed successfully."
+msgstr "Sottoscrizione annullata con successo."
