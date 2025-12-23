@@ -2,6 +2,27 @@
 
 All notable changes to the Custom PWA plugin will be documented in this file.
 
+## [1.0.6] - 2025-12-22
+
+### Added
+- **Internationalization (i18n)**: Complete translation support for 4 languages
+  - **French (fr_FR)**: 463/468 strings translated (98.9%)
+  - **German (de_DE)**: 464/468 strings translated (99.1%)
+  - **Spanish (es_ES)**: 464/468 strings translated (99.1%)
+  - **Italian (it_IT)**: 465/468 strings translated (99.4%)
+  - Generated POT template with 468 translatable strings
+  - Compiled MO binaries for all languages (43-45K each)
+  - Full admin interface translation in PWA Settings
+  - Translation files in `languages/` directory
+  - Automatic language detection based on WordPress settings
+
+### Documentation
+- **English translations**: All documentation translated to English
+  - `PUSH-REQUIREMENTS.md`: Push notification requirements
+  - `INSTALLATION.md`: Installation guide
+  - `SUMMARY-AUTO-INSTALLATION.md`: Quick start guide
+- **Translation workflow**: Documented process using ChatGPT for mass translation
+
 ## [1.0.5] - 2025-12-19
 
 ### Added
